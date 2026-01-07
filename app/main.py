@@ -66,9 +66,6 @@ async def update_sensor(data: SensorData):
     }
     return {"status": "ok"}
 
-# ... (Copy nốt các hàm get_coordinates, get_real_weather, AI... vào đây y như cũ)
-# Tôi lược bớt để code ngắn gọn, bạn nhớ giữ lại các hàm logic đó nhé!
-
 # --- 3. API THỜI TIẾT & ĐỊA ĐIỂM (OPEN-METEO) ---
 LOCATIONS = {
     "ST-01": {"name": "Sóc Trăng", "lat": 9.60, "lon": 105.97},

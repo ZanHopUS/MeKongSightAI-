@@ -1,52 +1,100 @@
-YDCC
+TÊN DỰ ÁN: HỆ THỐNG IOT ĐA PHƯƠNG THỨC & AI HỖ TRỢ RA QUYẾT ĐỊNH CHO MÔ HÌNH LUÂN CANH TÔM - LÚA THÍCH ỨNG BIẾN ĐỔI KHÍ HẬU TẠI ĐBSCL
 
-Hệ thống IoT Đa phương thức: Giám sát Môi trường & Hỗ trợ Ra quyết định cho mô hình Luân canh Tôm - Lúa & Cá - Lúa thích ứng biến đổi khí hậu tại ĐBSCL.
+Tên viết tắt: Mekong Sight AI
 
-Đặt vấn đề :
+I. TỔNG QUAN DỰ ÁN
+1. Đặt vấn đề
+Đồng bằng sông Cửu Long (ĐBSCL) đang chịu tác động nặng nề của biến đổi khí hậu, đặc biệt là tình trạng xâm nhập mặn thất thường và nguồn nước không ổn định. Các mô hình canh tác bền vững như Luân canh Tôm - Lúa và Cá - Lúa đang gặp khó khăn do nông dân thiếu công cụ giám sát môi trường chính xác và thiếu dữ liệu để quyết định thời điểm chuyển đổi mùa vụ hợp lý. Việc dựa hoàn toàn vào kinh nghiệm truyền thống dẫn đến rủi ro mất trắng vụ lúa do mặn đến sớm, hoặc tôm chết do sốc môi trường.
 
-* Mô hình luân canh tôm lúa ở ĐBSCL :
-- Mùa khô (t12 - t5) : người dân nuôi tôm (tôm sú, tôm càng xanh) trong ruộng (ao) đã được cải tạo, tận dụng nước mặn.
-- Mùa mưa (t6 - t11) : rửa mặn, trồng lúa chất lượng cao, tôm càng xanh có thể nuôi xen canh, tận dụng phân tôm làm dinh dưỡng, tạo hệ sinh thái bền vững, tăng hiệu quả kinh tế.
+2. Giải pháp đề xuất
+Mekong Sight AI là giải pháp công nghệ tích hợp giữa phần cứng IoT chi phí thấp và ứng dụng di động thông minh. Hệ thống cung cấp hai nhóm tính năng cốt lõi:
 
-* Mô hình luân canh cá lúa ở ĐBSCL :
-- Cá được thả vào ruộng khi mực nước phù hợp (sau gieo/lúc lúa con), thu hoạch cá trước hoặc cùng lúc với thu hoạch lúa; thời vụ và loài cá chọn theo vùng (cá đồng, cá rô, cá trê, v.v.).
-- Hiệu quả : Lúa cung cấp thức ăn (rơm rạ, sâu bệnh), cá sục bùn làm tơi xốp đất, ăn cỏ dại; phân cá là phân bón hữu cơ tự nhiên cho lúa.
+Giám sát thời gian thực & Cảnh báo: Theo dõi liên tục các chỉ số môi trường từ cảm biến để cảnh báo rủi ro tức thời.
 
-* Vấn đề của nông dân :
-- Rủi ro chuyển vụ: Việc chuyển đổi từ nước mặn (nuôi tôm) sang nước ngọt (trồng lúa/nuôi cá) thường dựa vào cảm tính. Nếu rửa mặn chưa sạch, lúa chết. Nếu nước ngọt về quá nhanh, tôm sốc chết.
-- Lãng phí tài nguyên: Không tận dụng được nguồn dinh dưỡng hữu cơ (rơm rạ phân hủy, phân tôm/cá) cho vụ lúa sau, gây lãng phí phân bón.
-- Quy trình canh tác chủ yếu dựa vào kinh nghiệm, "nhìn trời, nếm nước".
+Hỗ trợ ra quyết định & Phân tích chuyên sâu: Sử dụng AI để tư vấn lịch thời vụ linh hoạt dựa trên độ mặn thực tế và chẩn đoán dịch bệnh thông qua hình ảnh chụp từ người dân.
 
-2. Mục tiêu dự án :
+II. QUY TRÌNH VẬN HÀNH & TRẢI NGHIỆM NGƯỜI DÙNG
+Hệ thống được thiết kế tối ưu theo luồng hoạt động thực tế của nông dân, chia làm 3 giai đoạn:
 
-- Xây dựng một hệ thống chi phí thấp (Low-cost) tích hợp giữa Trạm quan trắc thực tế (Hardware) và Ứng dụng điện thoại (Mobile App) nhằm:
-- Giám sát tự động các chỉ số môi trường nước (Độ mặn, pH, Nhiệt độ).
-- Cảnh báo sớm rủi ro dịch bệnh/sốc môi trường.
-- Tư vấn thời điểm "Vàng" để xuống giống (chuyển vụ Tôm - Lúa & Cá - Lúa).
-- Phát triển Ứng dụng di động (Mobile App) tích hợp Đa chế độ (Multi-mode): Tôm - Cá - Lúa.
+1. Thiết lập ban đầu (Onboarding)
+Ngay khi cài đặt ứng dụng, người nông dân sẽ thực hiện khai báo thông tin cơ sở để hệ thống cá nhân hóa thuật toán:
 
-3. Kiến trúc hệ thống & Công nghệ
+Chọn mô hình canh tác: Tôm - Lúa hoặc Cá - Lúa.
 
-A. Phần cứng (Trạm quan trắc tại ruộng)
-Thiết kế dạng phao nổi, sử dụng năng lượng mặt trời.
-Vi xử lý: ESP32 (Có Wifi/Bluetooth, giá rẻ, tiết kiệm điện).
-Cảm biến (Sensors):
-- Cảm biến Độ mặn (EC/TDS): Quan trọng nhất. Dùng để xác định nồng độ muối.
-- Cảm biến pH: Giám sát phèn chua và môi trường sống của tôm.
-- Cảm biến Nhiệt độ nước: Cảnh báo sốc nhiệt.
-- Cảm biến Mực nước (Siêu âm): Giám sát triều cường/nước trong ruộng.
-Năng lượng: Pin Solar 10W + Pin Lithium.
+Xác định vị trí địa lý: Để hệ thống lấy dữ liệu thời tiết khu vực.
 
-B. Phần mềm (Mobile App)
-Nền tảng: Android.
-Tính năng chính:
-- Dashboard: Hiển thị số liệu Real-time (Thời gian thực).
-- Biểu đồ: Theo dõi lịch sử độ mặn giảm dần theo thời gian.
-- Cảnh báo (Notification): Rung chuông khi pH tụt thấp hoặc Độ mặn quá cao so với ngưỡng cài đặt.
--Hỗ trợ tiếng việt , giao diện thân thiện với nhà nông.
+Nhập ngày xuống giống: Hệ thống tự động tính toán giai đoạn sinh trưởng hiện tại của cây/con.
 
-4. Chức năng thông minh
+2. Giao diện chính: Giám sát & Cảnh báo (Real-time Monitoring)
+Đây là màn hình mặc định khi mở ứng dụng, hiển thị các chỉ số được cập nhật liên tục từ trạm quan trắc IoT lắp đặt tại ruộng.
 
-- Chế độ Đa canh (Multi-Mode Switch) :
-- Đánh giá dinh dưỡng (Gián tiếp):
-Thay vì đo N-P-K đắt tiền, App sẽ dùng thuật toán ước lượng: Dựa vào lượng thức ăn đã cho tôm ăn vụ trước + chỉ số TDS hiện tại + Màu nước (qua Camera điện thoại) -> Đưa ra khuyến nghị: "Nước còn nhiều dinh dưỡng hữu cơ. Khuyến nghị giảm 15-20% phân Đạm cho vụ Lúa này."
+a. Hiển thị chỉ số môi trường:
+
+Dữ liệu cập nhật 10-15 phút/lần.
+
+Các chỉ số quan trọng: Độ mặn (‰), Nhiệt độ (°C), Độ pH, Mực nước (cm).
+
+Giao diện trực quan dạng đồng hồ đo (Gauge) với 3 vùng màu: Xanh (An toàn) - Vàng (Chú ý) - Đỏ (Nguy hiểm).
+b. Hệ thống cảnh báo tự động (Alert System): Hệ thống tự động so sánh chỉ số thực đo với ngưỡng chịu đựng của vật nuôi/cây trồng trong giai đoạn hiện tại.
+
+Ví dụ: Nếu đang trong vụ Lúa mà độ mặn vượt quá 2‰ -> Ứng dụng phát cảnh báo đỏ: "Nước mặn xâm nhập! Ngưng bơm nước và đóng cống ngay lập tức."
+
+Ví dụ: Nếu đang nuôi Tôm mà nhiệt độ nước > 33°C -> Cảnh báo vàng: "Nhiệt độ cao, nguy cơ tôm sốc nhiệt. Cần bổ sung Vitamin C và bật quạt nước."
+
+3. Tính năng chuyên sâu: Phân tích theo yêu cầu (On-demand Analysis)
+Để tiết kiệm năng lượng và dữ liệu, tính năng phân tích nâng cao chỉ kích hoạt khi người dùng nhấn nút "Kiểm tra sức khỏe".
+
+a. Thu thập dữ liệu hình ảnh: Ứng dụng hướng dẫn người dân chụp 04 bức ảnh thực tế:
+
+Ảnh 1 - Màu nước: Để đánh giá mật độ tảo và chất lượng nước.
+
+Ảnh 2 - Vật nuôi (Tôm/Cá): Chụp trong vó/sàn ăn để kiểm tra sức khỏe, thức ăn thừa.
+
+Ảnh 3 - Cây lúa: Chụp cận cảnh lá/thân để phát hiện sâu bệnh.
+
+Ảnh 4 - Môi trường: Chụp bờ bao, cống để đánh giá rủi ro hạ tầng.
+
+b. Kết quả phân tích từ AI: Sau khi tải ảnh lên, AI (Computer Vision) sẽ phân tích và trả về kết quả:
+
+Chẩn đoán bệnh: Phát hiện sớm các dấu hiệu như đốm trắng trên tôm, đạo ôn trên lúa.
+
+Đánh giá rủi ro: Dự báo nguy cơ thiếu oxy (dựa trên màu nước + nhiệt độ) dù không có cảm biến đo oxy.
+
+Hướng dẫn xử lý: Đề xuất giải pháp cụ thể (thay nước, giảm thức ăn, sử dụng chế phẩm sinh học...).
+
+III. TÍNH NĂNG CHIẾN LƯỢC: TRỢ LÝ CHUYỂN ĐỔI MÙA VỤ
+Đây là tính năng quan trọng nhất giúp ứng phó biến đổi khí hậu (Climate Action). Thay vì tuân theo lịch thời vụ cố định ("đến tháng thì làm"), hệ thống đề xuất "Lịch thời vụ động" dựa trên dữ liệu thực tế.
+
+Cơ chế hoạt động: Hệ thống tổng hợp dữ liệu: [Tháng hiện tại] + [Độ mặn trung bình 3 ngày qua] + [Dự báo thời tiết].
+
+Các kịch bản khuyến nghị thông minh:
+
+Kịch bản Mặn đến sớm: Nếu đang cuối vụ lúa (Tháng 12) mà độ mặn tăng nhanh > 4‰, hệ thống khuyến nghị: "Mặn xâm nhập sớm hơn dự kiến. Bà con nên thu hoạch lúa gấp và chuẩn bị cải tạo đất để chuyển sang vụ nuôi Tôm sớm để tránh thiệt hại."
+Kịch bản Ngọt hóa kéo dài: Nếu đã đến lịch thả tôm (Tháng 1) nhưng nước vẫn ngọt (< 1‰), hệ thống khuyến nghị: "Độ mặn chưa đạt yêu cầu thả giống. Vui lòng đợi thêm hoặc chủ động pha nước mặn giả lập để ương giống trong bể trước."
+
+IV. GIẢI PHÁP KỸ THUẬT & CÔNG NGHỆ
+1. Phần cứng (Hardware - IoT Node)
+Thiết kế theo tiêu chí "Bền bỉ - Giá rẻ - Tiết kiệm năng lượng":
+
+Vi điều khiển: ESP32 (Hiệu năng cao, tích hợp Wifi/Bluetooth).
+
+Công nghệ truyền dẫn: LoRaWAN (Truyền dữ liệu đi xa 5-10km, không phụ thuộc sóng điện thoại tại điểm đo).
+
+Năng lượng: Tấm pin năng lượng mặt trời kết hợp pin lưu trữ, hoạt động độc lập không cần điện lưới.
+
+Cảm biến: Giới hạn ở 4 loại cơ bản (Độ mặn EC, pH, Nhiệt độ, Mực nước siêu âm) để giảm chi phí bảo trì.
+
+2. Phần mềm & Trí tuệ nhân tạo (Software & AI)
+AI Model: Sử dụng mạng nơ-ron tích chập (CNN) được huấn luyện trên bộ dữ liệu về bệnh thủy sản/lúa và màu nước thực tế tại ĐBSCL.
+
+Mobile App: Xây dựng trên nền tảng Flutter/React Native, giao diện đơn giản, phông chữ lớn, hỗ trợ điều khiển bằng giọng nói cho nông dân lớn tuổi.
+
+V. TÁC ĐỘNG CỦA DỰ ÁN
+Về Môi trường: Giúp tối ưu hóa việc sử dụng tài nguyên nước, hạn chế xả thải ô nhiễm ra môi trường nhờ kiểm soát tốt lượng thức ăn và thuốc qua giám sát hình ảnh.
+
+Về Kinh tế: Giảm thiểu rủi ro mất trắng vụ mùa (ước tính giảm 30% thiệt hại), nâng cao năng suất và chất lượng nông sản.
+
+Về Xã hội: Thay đổi tập quán canh tác của nông dân từ "làm theo kinh nghiệm" sang "làm nông thông minh dựa trên dữ liệu số".
+
+VI. KẾT LUẬN
+Mekong Sight AI không chỉ là một công cụ đo đạc, mà là người trợ lý đắc lực giúp nông dân ĐBSCL "thuận thiên" một cách chủ động. Bằng việc kết hợp các chỉ số giám sát thời gian thực với khả năng phân tích hình ảnh sâu rộng và tư vấn mùa vụ linh hoạt, dự án mang đến giải pháp thiết thực, khả thi và chi phí thấp để phát triển bền vững trong bối cảnh biến đổi khí hậu.

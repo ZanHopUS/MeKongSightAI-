@@ -42,7 +42,7 @@ Mở một Terminal khác, chạy lệnh:
 Copy đường link có đuôi ".trycloudflare.com" hiện ra màn hình.
 
 >>> BƯỚC 3: TRUY CẬP HỆ THỐNG
-- Dành cho Giám khảo/Nông dân (Trên điện thoại):
+- Dành cho Nông dân (Trên điện thoại):
    Truy cập vào đường link Cloudflare vừa copy ở Bước 2.
 
 - Dành cho Ban kỹ thuật/Admin (Trên máy tính):
