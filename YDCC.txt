@@ -1,0 +1,52 @@
+YDCC
+
+Hệ thống IoT Đa phương thức: Giám sát Môi trường & Hỗ trợ Ra quyết định cho mô hình Luân canh Tôm - Lúa & Cá - Lúa thích ứng biến đổi khí hậu tại ĐBSCL.
+
+Đặt vấn đề :
+
+* Mô hình luân canh tôm lúa ở ĐBSCL :
+- Mùa khô (t12 - t5) : người dân nuôi tôm (tôm sú, tôm càng xanh) trong ruộng (ao) đã được cải tạo, tận dụng nước mặn.
+- Mùa mưa (t6 - t11) : rửa mặn, trồng lúa chất lượng cao, tôm càng xanh có thể nuôi xen canh, tận dụng phân tôm làm dinh dưỡng, tạo hệ sinh thái bền vững, tăng hiệu quả kinh tế.
+
+* Mô hình luân canh cá lúa ở ĐBSCL :
+- Cá được thả vào ruộng khi mực nước phù hợp (sau gieo/lúc lúa con), thu hoạch cá trước hoặc cùng lúc với thu hoạch lúa; thời vụ và loài cá chọn theo vùng (cá đồng, cá rô, cá trê, v.v.).
+- Hiệu quả : Lúa cung cấp thức ăn (rơm rạ, sâu bệnh), cá sục bùn làm tơi xốp đất, ăn cỏ dại; phân cá là phân bón hữu cơ tự nhiên cho lúa.
+
+* Vấn đề của nông dân :
+- Rủi ro chuyển vụ: Việc chuyển đổi từ nước mặn (nuôi tôm) sang nước ngọt (trồng lúa/nuôi cá) thường dựa vào cảm tính. Nếu rửa mặn chưa sạch, lúa chết. Nếu nước ngọt về quá nhanh, tôm sốc chết.
+- Lãng phí tài nguyên: Không tận dụng được nguồn dinh dưỡng hữu cơ (rơm rạ phân hủy, phân tôm/cá) cho vụ lúa sau, gây lãng phí phân bón.
+- Quy trình canh tác chủ yếu dựa vào kinh nghiệm, "nhìn trời, nếm nước".
+
+2. Mục tiêu dự án :
+
+- Xây dựng một hệ thống chi phí thấp (Low-cost) tích hợp giữa Trạm quan trắc thực tế (Hardware) và Ứng dụng điện thoại (Mobile App) nhằm:
+- Giám sát tự động các chỉ số môi trường nước (Độ mặn, pH, Nhiệt độ).
+- Cảnh báo sớm rủi ro dịch bệnh/sốc môi trường.
+- Tư vấn thời điểm "Vàng" để xuống giống (chuyển vụ Tôm - Lúa & Cá - Lúa).
+- Phát triển Ứng dụng di động (Mobile App) tích hợp Đa chế độ (Multi-mode): Tôm - Cá - Lúa.
+
+3. Kiến trúc hệ thống & Công nghệ
+
+A. Phần cứng (Trạm quan trắc tại ruộng)
+Thiết kế dạng phao nổi, sử dụng năng lượng mặt trời.
+Vi xử lý: ESP32 (Có Wifi/Bluetooth, giá rẻ, tiết kiệm điện).
+Cảm biến (Sensors):
+- Cảm biến Độ mặn (EC/TDS): Quan trọng nhất. Dùng để xác định nồng độ muối.
+- Cảm biến pH: Giám sát phèn chua và môi trường sống của tôm.
+- Cảm biến Nhiệt độ nước: Cảnh báo sốc nhiệt.
+- Cảm biến Mực nước (Siêu âm): Giám sát triều cường/nước trong ruộng.
+Năng lượng: Pin Solar 10W + Pin Lithium.
+
+B. Phần mềm (Mobile App)
+Nền tảng: Android.
+Tính năng chính:
+- Dashboard: Hiển thị số liệu Real-time (Thời gian thực).
+- Biểu đồ: Theo dõi lịch sử độ mặn giảm dần theo thời gian.
+- Cảnh báo (Notification): Rung chuông khi pH tụt thấp hoặc Độ mặn quá cao so với ngưỡng cài đặt.
+-Hỗ trợ tiếng việt , giao diện thân thiện với nhà nông.
+
+4. Chức năng thông minh
+
+- Chế độ Đa canh (Multi-Mode Switch) :
+- Đánh giá dinh dưỡng (Gián tiếp):
+Thay vì đo N-P-K đắt tiền, App sẽ dùng thuật toán ước lượng: Dựa vào lượng thức ăn đã cho tôm ăn vụ trước + chỉ số TDS hiện tại + Màu nước (qua Camera điện thoại) -> Đưa ra khuyến nghị: "Nước còn nhiều dinh dưỡng hữu cơ. Khuyến nghị giảm 15-20% phân Đạm cho vụ Lúa này."
