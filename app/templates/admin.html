@@ -4,163 +4,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Control - Mekong Sight</title>
+    <title>Mekong Sight AI - Admin Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
+        :root {
+            --bg-dark: #1a1c23;
+            --card-bg: #24262d;
+            --text-main: #e2e8f0;
+            --accent: #3b82f6;
+            /* Xanh dương */
+            --danger: #ef4444;
+            /* Đỏ */
+            --success: #22c55e;
+            /* Xanh lá */
+            --warning: #f59e0b;
+            /* Vàng */
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
             padding: 20px;
-            background: #333;
-            color: white;
+            display: flex;
+            justify-content: center;
         }
 
-        .control-panel {
-            max-width: 500px;
-            margin: 0 auto;
-            background: #444;
-            padding: 20px;
-            border-radius: 15px;
-        }
-
-        h2 {
-            text-align: center;
-            color: #ff9800;
-        }
-
-        .btn-grid {
+        .container {
+            width: 100%;
+            max-width: 900px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
 
-        button {
-            padding: 20px;
-            font-size: 18px;
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .status-badge {
+            background: #22c55e20;
+            color: #22c55e;
+            padding: 5px 15px;
+            border-radius: 20px;
             font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: #94a3b8;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* BUTTONS GRID */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .btn-scenario {
+            padding: 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
             cursor: pointer;
+            transition: transform 0.2s, filter 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
             color: white;
+        }
+
+        .btn-scenario:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+        }
+
+        .btn-scenario:active {
+            transform: scale(0.98);
+        }
+
+        .sc-normal {
+            background: linear-gradient(135deg, #22c55e 0%, #166534 100%);
+        }
+
+        .sc-warn {
+            background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+        }
+
+        .sc-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+        }
+
+        .sc-rain {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        }
+
+        /* SLIDERS CONTROL */
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .control-val {
+            color: var(--accent);
+            font-family: monospace;
+            font-size: 18px;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #4b5563;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             transition: transform 0.1s;
         }
 
-        button:active {
-            transform: scale(0.95);
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
         }
 
-        .btn-safe {
-            background: #2e7d32;
-        }
-
-        /* Xanh */
-        .btn-danger {
-            background: #c62828;
-        }
-
-        /* Đỏ */
-        .btn-warning {
-            background: #f57f17;
-            color: #000;
-        }
-
-        /* Vàng */
-        .btn-reset {
-            background: #0277bd;
-            grid-column: span 2;
-        }
-
-        /* Reset */
-
-        .manual-input {
-            background: #555;
+        /* SWITCH TOGGLE */
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #2d3748;
             padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
         }
 
-        label {
-            display: block;
-            margin-top: 10px;
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
         }
 
-        input[type=range] {
-            width: 100%;
-            height: 25px;
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
 
-        .status {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #aaa;
+        .slider-switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider-switch:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider-switch {
+            background-color: var(--accent);
+        }
+
+        input:checked+.slider-switch:before {
+            transform: translateX(30px);
+        }
+
+        /* LOG */
+        #console-log {
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 10px;
+            height: 120px;
+            overflow-y: auto;
+            font-size: 13px;
+            border: 1px solid #333;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 2px;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="control-panel">
-        <h2>🎛️ BỘ ĐIỀU KHIỂN (GOD MODE)</h2>
+    <div class="container">
+        <header>
+            <div>
+                <h1 style="margin:0">Trung tâm Điều khiển</h1>
+                <span style="opacity: 0.7; font-size: 14px;">Mekong Sight AI • Digital Twin Control</span>
+            </div>
+            <div class="status-badge">
+                <div class="status-dot"></div> SYSTEM ONLINE
+            </div>
+        </header>
 
-        <div class="btn-grid">
-            <button class="btn-safe" onclick="sendData(1.5, 30, 7.5)">✅ BÌNH THƯỜNG</button>
-            <button class="btn-danger" onclick="sendData(12.5, 36, 4.5)">🚨 MẶN CAO (ĐỎ)</button>
-            <button class="btn-warning" onclick="sendData(3.5, 32, 6.5)">⚠️ CHỚM MẶN (VÀNG)</button>
-            <button class="btn-reset" onclick="sendData(0.5, 28, 8.0)">🌧️ SAU MƯA (NGỌT)</button>
+        <div class="card">
+            <h3><i class="fas fa-bolt"></i> Kịch bản Nhanh (Scenarios)</h3>
+            <div class="scenario-grid">
+                <button class="btn-scenario sc-normal" onclick="applyScenario('normal')">
+                    <i class="fas fa-check-circle fa-2x"></i> ỔN ĐỊNH
+                </button>
+                <button class="btn-scenario sc-warn" onclick="applyScenario('warning')">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i> CHỚM MẶN
+                </button>
+                <button class="btn-scenario sc-danger" onclick="applyScenario('danger')">
+                    <i class="fas fa-radiation fa-2x"></i> SỐC MẶN!
+                </button>
+                <button class="btn-scenario sc-rain" onclick="applyScenario('rain')">
+                    <i class="fas fa-cloud-showers-heavy fa-2x"></i> MƯA LỚN
+                </button>
+            </div>
         </div>
 
-        <div class="manual-input">
-            <h3>🎚️ Kéo thủ công</h3>
-            <label>Độ mặn: <b id="lbl-sal">0</b>‰</label>
-            <input type="range" min="0" max="20" step="0.1" value="0" oninput="updateManual()" id="rng-sal">
+        <div class="card">
+            <h3><i class="fas fa-sliders-h"></i> Tinh chỉnh Thủ công (Fine Tuning)</h3>
 
-            <label>Nhiệt độ: <b id="lbl-temp">30</b>°C</label>
-            <input type="range" min="20" max="40" step="0.5" value="30" oninput="updateManual()" id="rng-temp">
+            <div class="control-group">
+                <div class="control-header">
+                    <span><i class="fas fa-water"></i> Độ mặn (Salinity)</span>
+                    <span class="control-val" id="disp-sal">0 ‰</span>
+                </div>
+                <input type="range" id="rng-sal" min="0" max="20" step="0.1" value="0" oninput="manualUpdate()">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <span><i class="fas fa-thermometer-half"></i> Nhiệt độ (Temp)</span>
+                    <span class="control-val" id="disp-temp">30 °C</span>
+                </div>
+                <input type="range" id="rng-temp" min="15" max="45" step="0.5" value="30" oninput="manualUpdate()">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <span><i class="fas fa-flask"></i> Độ pH</span>
+                    <span class="control-val" id="disp-ph">7.5</span>
+                </div>
+                <input type="range" id="rng-ph" min="3" max="10" step="0.1" value="7.5" oninput="manualUpdate()">
+            </div>
+
+            <div class="toggle-container">
+                <div>
+                    <b style="color:white">Chế độ "Sống" (Auto-Drift)</b>
+                    <div style="font-size: 13px; opacity: 0.7;">Tự động dao động thông số nhẹ để giống thực tế</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-drift" onchange="toggleDrift()">
+                    <span class="slider-switch"></span>
+                </label>
+            </div>
         </div>
 
-        <p class="status" id="log">Sẵn sàng...</p>
+        <div class="card">
+            <h3><i class="fas fa-terminal"></i> Nhật ký gửi lệnh (Console Log)</h3>
+            <div id="console-log">
+                <div class="log-entry">> Ready to connect...</div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Hàm gửi dữ liệu lên Backend
-        async function sendData(sal, temp, ph) {
-            // Cập nhật hiển thị thanh kéo cho khớp
-            document.getElementById('rng-sal').value = sal;
-            document.getElementById('rng-temp').value = temp;
-            updateLabels(sal, temp);
+        let driftInterval = null;
 
+        // 1. Hàm gửi dữ liệu cốt lõi
+        async function sendData(s, t, p) {
+            // Cập nhật giao diện
+            document.getElementById('rng-sal').value = s;
+            document.getElementById('rng-temp').value = t;
+            document.getElementById('rng-ph').value = p;
+
+            document.getElementById('disp-sal').innerText = parseFloat(s).toFixed(1) + " ‰";
+            document.getElementById('disp-temp').innerText = parseFloat(t).toFixed(1) + " °C";
+            document.getElementById('disp-ph').innerText = parseFloat(p).toFixed(1);
+
+            // Gửi API
             const payload = {
-                station_id: "ADMIN-01",
-                salinity: parseFloat(sal),
-                temperature: parseFloat(temp),
-                ph: parseFloat(ph)
+                station_id: "ADMIN-GOD",
+                salinity: parseFloat(s),
+                temperature: parseFloat(t),
+                ph: parseFloat(p)
             };
 
             try {
                 await fetch('/api/update-sensor', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                document.getElementById('log').innerText = `Đã gửi: Mặn ${sal}‰ - ${temp}°C`;
-                document.getElementById('log').style.color = "#4caf50";
+                log(`Sent: Sal=${s} | Temp=${t} | pH=${p}`);
             } catch (e) {
-                document.getElementById('log').innerText = "❌ Mất kết nối Server!";
-                document.getElementById('log').style.color = "red";
+                log("ERROR: Connection failed!");
             }
         }
 
-        function updateManual() {
+        // 2. Xử lý khi kéo tay
+        function manualUpdate() {
             const s = document.getElementById('rng-sal').value;
             const t = document.getElementById('rng-temp').value;
-            updateLabels(s, t);
-            // Gửi dữ liệu liên tục khi kéo (Real-time)
-            sendData(s, t, 7.5);
+            const p = document.getElementById('rng-ph').value;
+            sendData(s, t, p);
         }
 
-        function updateLabels(s, t) {
-            document.getElementById('lbl-sal').innerText = s;
-            document.getElementById('lbl-temp').innerText = t;
+        // 3. Kịch bản nhanh
+        function applyScenario(type) {
+            // Tắt chế độ tự động nếu đang bật để tránh xung đột
+            if (document.getElementById('auto-drift').checked) {
+                document.getElementById('auto-drift').click();
+            }
+
+            if (type === 'normal') sendData(1.5, 29.5, 7.5);
+            if (type === 'warning') sendData(3.8, 32.0, 7.0);
+            if (type === 'danger') sendData(12.5, 36.5, 4.5);
+            if (type === 'rain') sendData(0.2, 26.0, 6.5);
+        }
+
+        // 4. Chế độ Tự động dao động (CỰC HAY CHO DEMO)
+        function toggleDrift() {
+            const isOne = document.getElementById('auto-drift').checked;
+            if (isOne) {
+                log(">> Auto-Drift Mode: ACTIVATED");
+                driftInterval = setInterval(() => {
+                    // Lấy giá trị hiện tại
+                    let s = parseFloat(document.getElementById('rng-sal').value);
+                    let t = parseFloat(document.getElementById('rng-temp').value);
+                    let p = parseFloat(document.getElementById('rng-ph').value);
+
+                    // Cộng trừ ngẫu nhiên một chút xíu (-0.1 đến +0.1)
+                    s += (Math.random() - 0.5) * 0.2;
+                    t += (Math.random() - 0.5) * 0.2;
+                    p += (Math.random() - 0.5) * 0.1;
+
+                    // Giữ trong giới hạn
+                    if (s < 0) s = 0; if (t < 10) t = 10; if (p < 0) p = 0;
+
+                    sendData(s.toFixed(2), t.toFixed(2), p.toFixed(2));
+                }, 2000); // Cập nhật mỗi 2 giây
+            } else {
+                log(">> Auto-Drift Mode: DEACTIVATED");
+                clearInterval(driftInterval);
+            }
+        }
+
+        // Hàm ghi log đẹp
+        function log(msg) {
+            const box = document.getElementById('console-log');
+            const time = new Date().toLocaleTimeString();
+            box.innerHTML = `<div class="log-entry">[${time}] ${msg}</div>` + box.innerHTML;
         }
     </script>
 
