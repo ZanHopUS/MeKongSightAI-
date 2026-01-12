@@ -4,51 +4,70 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import datetime, requests, json, os, math
+import datetime, random, requests, asyncio, math
+import json
+import os
 import google.generativeai as genai
 from PIL import Image
 import io
 
 app = FastAPI()
 
+# Cấu hình CORS
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
 
+# Cấu hình đường dẫn tĩnh
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
+# === CẤU HÌNH AI (Thay Key của bạn vào đây) ===
+GOOGLE_API_KEY = "AIzaSyDMd9LKnu0-JFbvjnIyL3muDYGthuudgW0" 
+try:
+    genai.configure(api_key=GOOGLE_API_KEY)
+    # Dùng model ổn định nhất
+    model = genai.GenerativeModel('gemini-flash-latest')
+except:
+    print("⚠️ Cảnh báo: Chưa cấu hình API Key hoặc lỗi kết nối AI")
 
-# CẤU HÌNH GEMINI AI
 
-GOOGLE_API_KEY = "AIzaSyDMd9LKnu0-JFbvjnIyL3muDYGthuudgW0"
-genai.configure(api_key=GOOGLE_API_KEY)
-
-# Sử dụng model Flash cho nhanh và rẻ
-model = genai.GenerativeModel('gemini-flash-latest')
-
-
-# 1. DATABASE & LOGIC CŨ 
+# 1. LOGIC LƯU TRỮ DỮ LIỆU (DATABASE MINI)
 
 DB_FILE = "sensor_data.json"
+
+# Dữ liệu mặc định (Dùng khi mới chạy lần đầu)
 default_status = {
     "salinity": 0, "temperature": 0, "ph": 0, 
     "water_level": 120, "is_danger": False, "alert": ""
 }
 
 def load_data():
+    """Đọc dữ liệu từ file JSON khi khởi động"""
     if os.path.exists(DB_FILE):
         try:
-            with open(DB_FILE, "r") as f: return json.load(f)
-        except: pass
+            with open(DB_FILE, "r") as f:
+                data = json.load(f)
+                print(f"✅ Đã khôi phục dữ liệu: {data}")
+                return data
+        except Exception as e:
+            print(f"⚠️ Lỗi đọc file data: {e}")
     return default_status.copy()
 
 def save_data(data):
+    """Lưu dữ liệu vào file JSON mỗi khi có cập nhật"""
     try:
-        with open(DB_FILE, "w") as f: json.dump(data, f)
-    except: pass
+        with open(DB_FILE, "w") as f:
+            json.dump(data, f)
+    except Exception as e:
+        print(f"⚠️ Không thể lưu dữ liệu: {e}")
 
+# Biến toàn cục (Load từ file ngay khi chạy)
 current_status = load_data()
+
+
+
+# 2. API GIAO DIỆN
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -58,25 +77,38 @@ async def read_root(request: Request):
 async def read_admin(request: Request):
     return templates.TemplateResponse("admin.html", {"request": request})
 
+# 3. API DỮ LIỆU THÔNG MINH
+
 @app.get("/api/get-status")
 async def get_status():
     return current_status
 
+# Class dữ liệu đầu vào (Cho phép thiếu trường water_level)
 class SensorData(BaseModel):
     station_id: str
     salinity: float
     temperature: float
     ph: float
-    water_level: float = 120.0
+    # Logic mới: Nếu thiết bị cũ không gửi mực nước, tự động điền 120
+    water_level: float = 120.0 
 
 @app.post("/api/update-sensor")
 async def update_sensor(data: SensorData):
     global current_status
+    
+    # Logic cảnh báo đa điều kiện
     is_danger = False
-    alert_msg = "Ổn định"
+    alert_msg = "Môi trường ổn định"
+    
+    # Điều kiện 1: Độ mặn cao
     if data.salinity > 4.0:
         is_danger = True
-        alert_msg = f"Độ mặn cao ({data.salinity}‰)"
+        alert_msg = f"Nguy hiểm! Độ mặn cao ({data.salinity}‰)"
+    
+    # Điều kiện 2: Mực nước quá thấp (Dễ gây nóng nước và tăng mặn)
+    if data.water_level < 50:
+        is_danger = True
+        alert_msg = "Cảnh báo! Mực nước quá thấp (Cạn)"
     
     current_status = {
         "salinity": round(data.salinity, 1),
@@ -86,10 +118,13 @@ async def update_sensor(data: SensorData):
         "is_danger": is_danger,
         "alert": alert_msg
     }
+    
+    # Tự động lưu xuống ổ cứng
     save_data(current_status)
-    return {"status": "ok"}
+    
+    return {"status": "ok", "saved": True}
 
-# 2. API THỜI TIẾT
+# 4. API THỜI TIẾT
 
 LOCATIONS = {
     "ST-01": {"name": "Sóc Trăng", "lat": 9.60, "lon": 105.97},
@@ -98,6 +133,7 @@ LOCATIONS = {
 
 def get_real_weather(lat, lon):
     try:
+        # Timeout 3s: Nếu mạng lag quá 3s thì tự cắt để không treo App
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&timezone=Asia%2FBangkok"
         res = requests.get(url, timeout=3).json()
         temp = res['current_weather']['temperature']
@@ -106,11 +142,14 @@ def get_real_weather(lat, lon):
         if code > 3: desc = "Có mây/Mưa"
         return {"temp": temp, "desc": desc}
     except:
-        return {"temp": 30.5, "desc": "Giả lập (Mất mạng)"}
+        # Fallback: Trả về dữ liệu giả lập nếu mất mạng
+        print("⚠️ Mất mạng: Đang dùng dữ liệu giả lập")
+        return {"temp": 30.5, "desc": "Giả lập (Offline)"}
 
 def get_tide_forecast():
     today = datetime.date.today()
     cycle = math.sin(today.day * 0.5)
+    
     return {
         "date": today.strftime("%d/%m/%Y"),
         "status": "TRIỀU CƯỜNG" if cycle > 0.4 else "BÌNH THƯỜNG",
@@ -124,44 +163,63 @@ async def get_weather_schedule(device_id: str = "ST-01"):
     loc = LOCATIONS.get(device_id, LOCATIONS["ST-01"])
     weather = get_real_weather(loc['lat'], loc['lon'])
     tide = get_tide_forecast()
-    return {"location_name": loc['name'], "weather": weather, "tide": tide}
+    return {
+        "location_name": loc['name'], # Khớp với frontend cũ của bạn
+        "weather": weather,
+        "tide": tide
+    }
 
-
-# 3. TÍCH HỢP GEMINI VISION
+# 5. API AI (XỬ LÝ LỖI THÔNG MINH)
 
 @app.post("/api/analyze-image")
 async def analyze_image(file: UploadFile = File(...)):
+    # Kiểm tra xem có Key chưa
+    if not GOOGLE_API_KEY:
+        return {"status": "error", "msg": "Chưa có API Key", "solution": "Liên hệ Admin cấu hình lại."}
+
     try:
-        # 1. Đọc ảnh từ client gửi lên
         contents = await file.read()
         image = Image.open(io.BytesIO(contents))
-
-        # 2. Câu lệnh Prompt gửi cho Gemini (Yêu cầu trả về JSON chuẩn)
         prompt = """
-        Bạn là chuyên gia nông nghiệp AI. Hãy nhìn vào ảnh cây lúa này và phân tích.
-        Hãy trả về kết quả CHỈ LÀ MỘT JSON thuần túy (không markdown) theo định dạng sau:
+        Đóng vai là một Chuyên gia Nông nghiệp và Thủy sản hàng đầu tại Đồng bằng sông Cửu Long.
+        Nhiệm vụ của bạn là phân tích hình ảnh đầu vào để hỗ trợ nông dân chẩn đoán bệnh cho: LÚA, TÔM, hoặc CÁ.
+
+        Hãy thực hiện các bước suy luận sau:
+        1. NHẬN DIỆN: Đây là Lúa, Tôm, hay Cá? (Nếu không phải 3 loại này, trả về unknown).
+        2. QUAN SÁT TRIỆU CHỨNG:
+           - Nếu là Lúa: Tìm các đốm nâu (đạo ôn), vệt vàng (cháy bìa lá), sâu cuốn lá, rầy nâu...
+           - Nếu là Tôm: Quan sát màu sắc gan tụy, ruột, vỏ (đốm trắng), cơ thịt (đục cơ).
+           - Nếu là Cá: Quan sát vây, mang, da (xuất huyết, nấm, lở loét).
+        3. KẾT LUẬN: Đưa ra chẩn đoán chính xác nhất.
+
+        Yêu cầu trả về kết quả dưới dạng JSON thuần túy (tuyệt đối không dùng Markdown, không dùng ```json):
         {
-            "status": "healthy" hoặc "sick",
-            "msg": "Tên bệnh hoặc Tình trạng (Ngắn gọn)",
-            "solution": "Giải pháp khắc phục cụ thể (Ngắn gọn dưới 20 từ)"
+            "status": "healthy" (nếu khỏe) hoặc "sick" (nếu có dấu hiệu bệnh),
+            "msg": "Tên đối tượng + Tên bệnh cụ thể (Ví dụ: 'Tôm thẻ bị hoại tử gan tụy', 'Lúa bị đạo ôn cổ bông')",
+            "solution": "Giải pháp kỹ thuật ngắn gọn, hiệu quả (Dưới 20 từ, ví dụ: 'Thay nước, tạt khoáng', 'Phun thuốc Beam 75WP')"
         }
-        Nếu không phải ảnh cây cối/lúa, hãy trả về status: "unknown".
+
+        Trường hợp không xác định được hoặc ảnh mờ, hãy trả về:
+        {
+            "status": "unknown", 
+            "msg": "Ảnh không rõ ràng hoặc không đúng đối tượng", 
+            "solution": "Vui lòng chụp lại cận cảnh vùng bị bệnh"
+        }
         """
 
-        # 3. Gọi Gemini xử lý
         response = model.generate_content([prompt, image])
         
-        # 4. Xử lý kết quả trả về (Lọc bỏ Markdown ```json nếu có)
+        # Làm sạch kết quả trả về (đề phòng AI vẫn thêm markdown)
         text_res = response.text.replace("```json", "").replace("```", "").strip()
-        result_json = json.loads(text_res)
-
-        return result_json
+        return json.loads(text_res)
 
     except Exception as e:
-        print(f"Lỗi AI: {e}")
-        # Fallback nếu AI lỗi hoặc hết quota
+        print(f"❌ Lỗi AI: {e}")
         return {
             "status": "sick", 
             "msg": "⚠️ Lỗi kết nối AI", 
-            "solution": "Vui lòng thử lại sau giây lát."
+            "solution": "Vui lòng kiểm tra lại mạng wifi/4G."
         }
+
+# In thông báo khi chạy
+print("🚀 Backend MekongSight AI (Logic V2) đang chạy...")

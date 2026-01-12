@@ -16,7 +16,10 @@ MekongSightAI/
  │    ├── main.py           # Server xử lý trung tâm (FastAPI)
  │    ├── static/           # Chứa file CSS, JS, Hình ảnh
  │    └── templates/        # Chứa giao diện HTML (Admin & User)
+ ├── admin.html             # Web điều chỉnh dữ liệu
+ ├── check_ai.py            # Kiểm tra API_KEY có thể sử dụng
  ├── iot_simulator.py       # Tool giả lập dữ liệu tự động (Optional)
+ ├── sensor_data.json       # Cơ sở dữ liệu mini (Tự động tạo)
  ├── cloudflared.exe        # Công cụ đưa Web lên Internet
  ├── requirements.txt       # Danh sách thư viện cần cài đặt
  └── README.txt             # Hướng dẫn sử dụng

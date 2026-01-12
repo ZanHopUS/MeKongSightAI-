@@ -1,45 +1,52 @@
 import requests
 import time
 import random
+import json
 
-# Địa chỉ IP máy tính của bạn (Hãy thay đổi nếu IP thay đổi)
-# Lưu ý: Giữ nguyên port 8000 và đường dẫn /api/update-sensor
-API_URL = "http://127.0.0.1:8000/api/update-sensor" 
-# Nếu chạy trên điện thoại thì nhớ đổi 127.0.0.1 thành IP máy tính (ví dụ 172.20.10.3)
+# Địa chỉ Server (Backend)
+SERVER_URL = "http://127.0.0.1:8000/api/update-sensor"
 
-def generate_fake_data():
-    print(f"⏳ Đang đo đạc... (Gửi dữ liệu lúc {time.strftime('%H:%M:%S')})")
-    
-    # Tỉ lệ 10% xảy ra sự cố (để test cảnh báo)
-    is_shock = random.random() < 0.1 
-    
-    if is_shock:
-        return {
-            "station_id": "ST-01",
-            "salinity": random.uniform(5.0, 15.0), # Mặn cao
-            "temperature": random.uniform(34.0, 38.0), # Nóng
-            "ph": random.uniform(4.0, 5.0) # Phèn
-        }
-    else:
-        return {
-            "station_id": "ST-01",
-            "salinity": random.uniform(0.5, 2.5), # Bình thường
-            "temperature": random.uniform(28.0, 32.0),
-            "ph": random.uniform(7.0, 8.5)
-        }
+print("📡 ĐANG KHỞI ĐỘNG CẢM BIẾN IOT GIẢ LẬP...")
+print(f"🎯 Mục tiêu gửi: {SERVER_URL}")
 
-# --- VÒNG LẶP CHÍNH ---
+# Trạng thái ban đầu
+current_salinity = 1.5
+current_temp = 29.5
+current_ph = 7.5
+current_water = 120
+
 while True:
-    data = generate_fake_data()
     try:
-        response = requests.post(API_URL, json=data)
-        if response.status_code == 200:
-            print("✅ Đã gửi dữ liệu thành công!")
-            print("💤 Hệ thống sẽ ngủ đông 1 phút để tiết kiệm pin...")
-        else:
-            print(f"❌ Lỗi Server: {response.status_code}")
-    except Exception as e:
-        print("❌ Không kết nối được Server (Kiểm tra xem backend.py đã chạy chưa?)")
+        # 1. Tạo dao động ngẫu nhiên (để số liệu nhảy múa cho sinh động)
+        current_salinity += random.uniform(-0.2, 0.3)
+        current_temp += random.uniform(-0.1, 0.1)
+        current_ph += random.uniform(-0.05, 0.05)
+        current_water += random.uniform(-1, 1)
+
+        # Giới hạn số liệu không cho âm hoặc quá cao
+        if current_salinity < 0: current_salinity = 0
+        if current_water < 0: current_water = 0
         
-    # QUAN TRỌNG: Ngủ 15 giây
-    time.sleep(15)
+        # 2. Đóng gói dữ liệu
+        payload = {
+            "station_id": "ST-01",
+            "salinity": round(current_salinity, 1),
+            "temperature": round(current_temp, 1),
+            "ph": round(current_ph, 1),
+            "water_level": int(current_water)
+        }
+
+        # 3. Gửi lên Server
+        response = requests.post(SERVER_URL, json=payload, timeout=2)
+        
+        if response.status_code == 200:
+            print(f"✅ Đã gửi: Mặn={payload['salinity']} | Nước={payload['water_level']}cm | Temp={payload['temperature']}")
+        else:
+            print(f"⚠️ Lỗi Server: {response.status_code}")
+
+    except Exception as e:
+        print(f"❌ Mất kết nối tới Server: {e}")
+        print("   -> Đang thử lại...")
+
+    # Nghỉ 2 giây rồi gửi tiếp
+    time.sleep(2)
