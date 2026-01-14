@@ -17,6 +17,7 @@ MekongSightAI/
  │    ├── static/           # Chứa file CSS, JS, Hình ảnh
  │    └── templates/        # Chứa giao diện HTML (Admin & User)
  ├── admin.html             # Web điều chỉnh dữ liệu
+ ├── get_link.py            # Tool tự động lấy link Online (Mới)
  ├── check_ai.py            # Kiểm tra API_KEY có thể sử dụng
  ├── iot_simulator.py       # Tool giả lập dữ liệu tự động (Optional)
  ├── sensor_data.json       # Cơ sở dữ liệu mini (Tự động tạo)
@@ -40,14 +41,9 @@ Mở Terminal, chạy lệnh sau:
 
 >>> BƯỚC 2: TẠO ĐƯỜNG DẪN ONLINE (Để truy cập bằng điện thoại)
 Mở một Terminal khác, chạy lệnh:
-   .\cloudflared tunnel --url http://localhost:8000
+   python get_link.py
 
-Copy đường link có đuôi ".trycloudflare.com" hiện ra màn hình.
 
 >>> BƯỚC 3: TRUY CẬP HỆ THỐNG
-- Dành cho Nông dân (Trên điện thoại):
-   Truy cập vào đường link Cloudflare vừa copy ở Bước 2.
-
-- Dành cho Ban kỹ thuật/Admin (Trên máy tính):
-   Truy cập: http://localhost:8000/admin
+Lấy link trong terminal sau khi chạy 
 
