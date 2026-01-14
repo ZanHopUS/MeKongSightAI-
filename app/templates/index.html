@@ -3,126 +3,250 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mekong Sight AI Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mekong Sight AI - Giám sát Nông nghiệp Thông minh</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-    <div class="app-container">
-
-        <div id="login-screen">
-            <div class="login-card">
-                <i class="fas fa-leaf" style="font-size: 60px; color: var(--primary-color); margin-bottom: 20px;"></i>
-                <h2 style="color: var(--primary-color); font-size: 28px; margin-top: 0;">Mekong Sight</h2>
-
-                <div class="input-group">
-                    <label class="input-label">Mã số trạm:</label>
-                    <input type="text" id="device-id" class="big-input" value="ST-01" placeholder="Nhập mã...">
+    <div id="login-container" class="login-wrapper">
+        <div class="login-content">
+            <div class="intro-section">
+                <div class="brand">
+                    <i class="fas fa-leaf"></i> MEKONG SIGHT AI
                 </div>
+                <h1>Giải pháp Nông nghiệp số<br>cho người dân ĐBSCL</h1>
+                <p class="tagline">Giám sát môi trường Lúa - Tôm - Cá 24/7 cùng Trợ lý AI chẩn đoán bệnh tức thời.</p>
 
-                <div class="input-group">
-                    <label class="input-label">Chọn mô hình:</label>
-                    <select id="farming-model" class="big-input">
-                        <option>Lúa - Tôm</option>
-                        <option>Lúa - Cá</option>
-                        <option>Chuyên Lúa</option>
-                    </select>
-                </div>
-
-                <button class="big-btn" onclick="userLogin()">
-                    BẮT ĐẦU <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-            <p style="margin-top: 30px; font-size: 14px; opacity: 0.8;">Hệ thống hỗ trợ nông dân ĐBSCL</p>
-        </div>
-
-        <header>
-            <div class="header-info">
-                <h1 id="disp-loc">Trạm: ...</h1>
-                <p id="disp-model">Mô hình: ...</p>
-            </div>
-            <div style="position: relative;">
-                <i class="fas fa-bell" style="font-size: 28px;"></i>
-                <span id="alert-dot"
-                    style="position: absolute; top:0; right:0; width:12px; height:12px; background:red; border-radius:50%; border: 2px solid white; display:none;"></span>
-            </div>
-        </header>
-
-        <main id="main-content">
-            <div id="tab-home">
-                <div id="danger-alert" class="alert-box">
-                    <div class="alert-title"><i class="fas fa-exclamation-triangle"></i> CẢNH BÁO</div>
-                    <span id="danger-msg" style="font-size: 18px;">Độ mặn vượt mức cho phép!</span>
-                </div>
-
-                <div class="card gauge-card">
-                    <h3 style="margin: 0 0 15px 0; color: #555;">ĐỘ MẶN HIỆN TẠI</h3>
-                    <div class="gauge-wrapper">
-                        <div class="gauge-arc"></div>
-                        <div class="gauge-needle-box" id="needle">
-                            <div class="gauge-needle"></div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <i class="fas fa-satellite-dish"></i>
+                        <div>
+                            <strong>Giám sát IoT</strong>
+                            <span>Đo độ mặn, pH, nhiệt độ, mực nước tự động.</span>
                         </div>
                     </div>
-                    <div class="big-number" id="val-salinity">--</div>
-                    <div class="unit-label">Phần nghìn (‰)</div>
-                </div>
-
-                <div class="metrics-grid">
-                    <div class="metric-item">
-                        <i class="fas fa-thermometer-half"
-                            style="color: #e53935; font-size: 30px; margin-bottom: 10px;"></i>
-                        <div class="metric-label">Nhiệt độ</div>
-                        <div class="metric-val" id="val-temp">--°C</div>
+                    <div class="feature-item">
+                        <i class="fas fa-robot"></i>
+                        <div>
+                            <strong>AI Vision</strong>
+                            <span>Chụp ảnh để phát hiện bệnh trên cây trồng vật nuôi.</span>
+                        </div>
                     </div>
-                    <div class="metric-item">
-                        <i class="fas fa-tint" style="color: #1e88e5; font-size: 30px; margin-bottom: 10px;"></i>
-                        <div class="metric-label">Độ pH</div>
-                        <div class="metric-val" id="val-ph">--</div>
+                    <div class="feature-item">
+                        <i class="fas fa-cloud-sun-rain"></i>
+                        <div>
+                            <strong>Lịch vụ thông minh</strong>
+                            <span>Cập nhật thời tiết và thủy triều theo thời gian thực.</span>
+                        </div>
                     </div>
                 </div>
 
-                <button class="camera-btn" onclick="document.getElementById('ai-file').click()">
-                    <i class="fas fa-camera"></i>
-                    KIỂM TRA BỆNH
-                </button>
-                <input type="file" id="ai-file" hidden accept="image/*" onchange="runAI(this)">
-
-                <div id="ai-result-card" class="card"
-                    style="display: none; text-align: center; border: 2px solid var(--primary-color);">
-                    <img id="ai-img"
-                        style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 15px;">
-                    <h3 id="ai-status" style="font-size: 22px; margin: 0;">Đang phân tích...</h3>
-                    <p id="ai-detail" style="font-size: 16px;">Vui lòng chờ giây lát</p>
+                <div class="usage-guide">
+                    <h3><i class="fas fa-book-open"></i> Hướng dẫn nhanh:</h3>
+                    <ul>
+                        <li>1. Đăng nhập bằng tài khoản được cấp (VD: user1 / 123).</li>
+                        <li>2. Xem các chỉ số môi trường ở tab <b>Giám sát</b>.</li>
+                        <li>3. Chụp ảnh cây/con nghi bệnh ở tab <b>AI Vision</b>.</li>
+                    </ul>
                 </div>
             </div>
 
-            <div id="tab-calendar" style="display: none;">
-                <p style="text-align:center; margin-top:50px;">Đang tải dữ liệu thời tiết...</p>
-            </div>
-        </main>
+            <div class="form-section">
+                <div class="login-box">
+                    <h2>Đăng Nhập</h2>
+                    <p>Vui lòng nhập thông tin tài khoản của bạn</p>
 
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('home', this)">
-                <i class="fas fa-chart-pie"></i>
-                <span>Giám sát</span>
-            </div>
-            <div class="nav-item" onclick="switchTab('calendar', this)">
-                <i class="fas fa-calendar-day"></i>
-                <span>Lịch vụ</span>
-            </div>
-            <div class="nav-item" onclick="window.location.reload()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Thoát</span>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" placeholder="Tài khoản (VD: user1)">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Mật khẩu">
+                    </div>
+
+                    <div id="login-error" class="error-msg">
+                        <i class="fas fa-exclamation-circle"></i> <span>Sai tài khoản hoặc mật khẩu!</span>
+                    </div>
+
+                    <button class="btn-primary" onclick="handleLogin()">
+                        Truy cập Hệ thống <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <div class="support-text">
+                        Cần hỗ trợ? Liên hệ: <b>0909.xxx.xxx</b>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
 
+    <div id="main-app" class="app-container" style="display: none;">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-leaf logo-icon"></i>
+                <div class="user-info">
+                    <h3 id="display-name">Xin chào, User</h3>
+                    <span class="status-badge"><span class="dot"></span> Online</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-link active" onclick="switchPage('monitor')" id="nav-monitor">
+                    <i class="fas fa-chart-line"></i> <span>Giám sát</span>
+                </a>
+                <a href="#" class="nav-link" onclick="switchPage('weather')" id="nav-weather">
+                    <i class="fas fa-calendar-alt"></i> <span>Lịch vụ</span>
+                </a>
+                <a href="#" class="nav-link" onclick="switchPage('ai')" id="nav-ai">
+                    <i class="fas fa-brain"></i> <span>Trợ lý AI</span>
+                </a>
+                <a href="#" class="nav-link logout" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> <span>Đăng xuất</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+
+            <section id="page-monitor" class="page-section active">
+                <div class="section-header">
+                    <h2>Giám sát Môi trường</h2>
+                    <span class="date-now" id="current-date">--/--/----</span>
+                </div>
+
+                <div id="alert-box" class="alert-card" style="display: none;">
+                    <div class="alert-icon"><i class="fas fa-bell"></i></div>
+                    <div class="alert-content">
+                        <h4>Cảnh báo Quan trọng!</h4>
+                        <p id="alert-msg">...</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card gauge-card">
+                        <div class="card-title">Độ mặn (Salinity)</div>
+                        <div class="gauge-container">
+                            <div class="gauge-body">
+                                <div class="gauge-fill"></div>
+                                <div class="gauge-cover"></div>
+                                <div class="gauge-needle" id="gauge-needle"></div>
+                            </div>
+                            <div class="gauge-value" id="val-sal">0.0</div>
+                            <div class="gauge-unit">Phần nghìn (‰)</div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-container">
+                        <div class="card metric-card temp">
+                            <div class="icon"><i class="fas fa-temperature-high"></i></div>
+                            <div>
+                                <div class="label">Nhiệt độ</div>
+                                <div class="value" id="val-temp">-- °C</div>
+                            </div>
+                        </div>
+                        <div class="card metric-card ph">
+                            <div class="icon"><i class="fas fa-flask"></i></div>
+                            <div>
+                                <div class="label">Độ pH</div>
+                                <div class="value" id="val-ph">--</div>
+                            </div>
+                        </div>
+                        <div class="card metric-card water">
+                            <div class="icon"><i class="fas fa-water"></i></div>
+                            <div>
+                                <div class="label">Mực nước</div>
+                                <div class="value" id="val-water">-- cm</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-weather" class="page-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Lịch vụ & Thời tiết</h2>
+                </div>
+
+                <div class="weather-grid">
+                    <div class="card weather-card-main">
+                        <div class="weather-icon"><i class="fas fa-cloud-sun"></i></div>
+                        <div class="weather-info">
+                            <h3>Thời tiết hiện tại</h3>
+                            <div class="temp-big" id="weather-temp">--°C</div>
+                            <p id="weather-desc">Đang cập nhật dữ liệu...</p>
+                            <p class="location"><i class="fas fa-map-marker-alt"></i> Sóc Trăng, VN</p>
+                        </div>
+                    </div>
+
+                    <div class="card tide-card-main">
+                        <div class="tide-header">
+                            <i class="fas fa-water"></i> Dự báo Thủy triều
+                        </div>
+                        <div class="tide-body">
+                            <div class="tide-level" id="tide-level">--</div>
+                            <div class="tide-advice" id="tide-advice">--</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-ai" class="page-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Trợ lý AI Chẩn đoán</h2>
+                </div>
+
+                <div class="ai-container">
+                    <div class="card ai-upload-card">
+                        <div class="ai-icon-wrapper">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3>Bác sĩ Nông nghiệp AI</h3>
+                        <p>Chụp ảnh Lúa, Tôm, Cá để phát hiện bệnh sớm.</p>
+
+                        <button class="btn-primary btn-camera"
+                            onclick="document.getElementById('camera-input').click()">
+                            <i class="fas fa-camera"></i> Chụp ảnh / Tải ảnh lên
+                        </button>
+                        <input type="file" id="camera-input" accept="image/*" hidden onchange="uploadImage()">
+                    </div>
+
+                    <div id="ai-result" class="card ai-result-card" style="display: none;">
+                        <img id="preview-img" src="" alt="Ảnh phân tích">
+                        <div class="ai-analysis">
+                            <h3 id="ai-status">Đang phân tích...</h3>
+                            <div class="solution-box">
+                                <strong><i class="fas fa-user-md"></i> Lời khuyên:</strong>
+                                <p id="ai-solution">...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div class="mobile-nav">
+            <div class="mobile-item active" onclick="switchPage('monitor')" id="mob-monitor">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="mobile-item" onclick="switchPage('weather')" id="mob-weather">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="mobile-item center-btn" onclick="switchPage('ai')" id="mob-ai">
+                <i class="fas fa-camera"></i>
+            </div>
+            <div class="mobile-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+        </div>
     </div>
 
     <script src="/static/js/script.js"></script>
-
 </body>
 
 </html>

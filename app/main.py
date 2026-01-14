@@ -23,7 +23,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 # === CẤU HÌNH AI (Thay Key của bạn vào đây) ===
-GOOGLE_API_KEY = "AIzaSyDMd9LKnu0-JFbvjnIyL3muDYGthuudgW0" 
+GOOGLE_API_KEY = "AIzaSyAMlaUxEsQV1ilSwKMEgtQWqXWk877dZTE" 
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
     # Dùng model ổn định nhất
@@ -223,3 +223,50 @@ async def analyze_image(file: UploadFile = File(...)):
 
 # In thông báo khi chạy
 print("🚀 Backend MekongSight AI (Logic V2) đang chạy...")
+
+
+USER_DB_FILE = "users.json"
+
+def load_users():
+    """Hàm đọc danh sách người dùng từ file"""
+    if os.path.exists(USER_DB_FILE):
+        try:
+            with open(USER_DB_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"⚠️ Lỗi đọc file user: {e}")
+    
+    # Nếu file không tồn tại, tạo tài khoản mặc định
+    default_users = [
+        {"username": "admin", "password": "123", "name": "Admin Mặc định", "role": "admin"}
+    ]
+    # Tự động tạo file nếu chưa có
+    try:
+        with open(USER_DB_FILE, "w", encoding="utf-8") as f:
+            json.dump(default_users, f, indent=4, ensure_ascii=False)
+    except: pass
+    
+    return default_users
+
+class LoginData(BaseModel):
+    username: str
+    password: str
+
+@app.post("/api/login")
+async def login(data: LoginData):
+    # 1. Đọc danh sách mới nhất từ file json
+    users = load_users()
+    
+    # 2. Duyệt qua từng người để tìm tài khoản khớp
+    for user in users:
+        if user['username'] == data.username and user['password'] == data.password:
+            # Tìm thấy! Trả về thành công kèm tên người dùng
+            return {
+                "status": "ok", 
+                "msg": f"Xin chào, {user['name']}!", 
+                "username": user['username'],
+                "role": user['role']
+            }
+            
+    # 3. Quét hết danh sách mà không khớp ai
+    return {"status": "error", "msg": "Sai tài khoản hoặc mật khẩu!"}

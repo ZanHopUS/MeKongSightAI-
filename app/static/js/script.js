@@ -1,158 +1,182 @@
-// script.js
+let updateInterval;
+let weatherInterval;
 
-// Biến lưu mã trạm hiện tại (Mặc định ST-01)
-let currentStationId = "ST-01";
+// === 1. HỆ THỐNG ĐĂNG NHẬP ===
+async function handleLogin() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    const errorBox = document.getElementById('login-error');
 
-// --- 1. LOGIC GIAO DIỆN & ĐĂNG NHẬP ---
-function userLogin() {
-    const idInput = document.getElementById('device-id').value;
-    const modelInput = document.getElementById('farming-model').value;
+    if (!user || !pass) {
+        showLoginError("Vui lòng nhập đầy đủ thông tin!");
+        return;
+    }
 
-    // Kiểm tra đầu vào
-    if (!idInput) return alert("Vui lòng nhập mã trạm (VD: ST-01, BL-02)");
+    try {
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
 
-    // Lưu mã trạm để gọi API thời tiết
-    currentStationId = idInput;
+        if (data.status === 'ok') {
+            // Đăng nhập thành công
+            document.getElementById('login-container').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('main-app').style.display = 'flex';
+            }, 500);
 
-    // Hiệu ứng trượt màn hình đăng nhập lên
-    document.getElementById('login-screen').style.transform = "translateY(-100%)";
+            // Cập nhật thông tin User
+            document.getElementById('display-name').innerText = "Xin chào, " + (data.username || user);
 
-    // Cập nhật thông tin Header
-    document.getElementById('disp-loc').innerText = "Trạm: " + idInput;
-    document.getElementById('disp-model').innerText = modelInput;
-
-    // Gọi dữ liệu ngay lập tức khi vào
-    updateSensorData();
-    updateWeatherAndTide();
-
-    // Đặt lịch cập nhật tự động
-    setInterval(updateSensorData, 2000); // Cảm biến: 2 giây/lần
-    setInterval(updateWeatherAndTide, 60000); // Thời tiết: 60 giây/lần
+            // Khởi động hệ thống
+            initSystem();
+        } else {
+            showLoginError(data.msg);
+        }
+    } catch (e) {
+        showLoginError("Lỗi kết nối Server! Vui lòng kiểm tra lại.");
+        console.error(e);
+    }
 }
 
-function switchTab(tabId, el) {
-    // Xóa active ở các nút cũ
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    // Thêm active cho nút mới bấm
-    el.classList.add('active');
-
-    // Ẩn tất cả tab
-    document.getElementById('tab-home').style.display = 'none';
-    document.getElementById('tab-calendar').style.display = 'none';
-
-    // Hiện tab được chọn
-    document.getElementById('tab-' + tabId).style.display = 'block';
+function showLoginError(msg) {
+    const box = document.getElementById('login-error');
+    box.style.display = 'flex';
+    box.querySelector('span').innerText = msg;
+    box.classList.add('shake-anim');
+    setTimeout(() => box.classList.remove('shake-anim'), 500);
 }
 
-// --- 2. LẤY DỮ LIỆU CẢM BIẾN (Real-time từ Simulator) ---
-async function updateSensorData() {
+function handleLogout() {
+    if (confirm("Bạn có chắc muốn đăng xuất?")) {
+        location.reload(); // Tải lại trang để về màn hình login
+    }
+}
+
+// === 2. ĐIỀU HƯỚNG (NAVIGATION) ===
+function switchPage(pageId) {
+    // Ẩn tất cả trang
+    document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+    // Hiện trang đích
+    document.getElementById('page-' + pageId).classList.add('active');
+
+    // Cập nhật Menu (PC & Mobile)
+    document.querySelectorAll('.nav-link, .mobile-item').forEach(el => el.classList.remove('active'));
+
+    if (document.getElementById('nav-' + pageId)) document.getElementById('nav-' + pageId).classList.add('active');
+    if (document.getElementById('mob-' + pageId)) document.getElementById('mob-' + pageId).classList.add('active');
+}
+
+// === 3. LOGIC HỆ THỐNG ===
+function initSystem() {
+    // Cập nhật ngày
+    const now = new Date();
+    document.getElementById('current-date').innerText = now.toLocaleDateString('vi-VN');
+
+    // Gọi dữ liệu lần đầu
+    fetchSensorData();
+    fetchWeather();
+
+    // Thiết lập vòng lặp
+    updateInterval = setInterval(fetchSensorData, 2000); // 2s/lần
+    weatherInterval = setInterval(fetchWeather, 60000); // 1 phút/lần
+}
+
+async function fetchSensorData() {
     try {
         const res = await fetch('/api/get-status');
         const data = await res.json();
 
-        // Cập nhật số liệu lên màn hình
-        document.getElementById('val-salinity').innerText = data.salinity;
-        document.getElementById('val-temp').innerText = data.temperature + "°C";
+        // Cập nhật số liệu
+        document.getElementById('val-sal').innerText = data.salinity.toFixed(1);
+        document.getElementById('val-temp').innerText = data.temperature + " °C";
         document.getElementById('val-ph').innerText = data.ph;
+        document.getElementById('val-water').innerText = data.water_level + " cm";
 
-        // Xử lý Quay kim đồng hồ
-        const maxSalinity = 20; // Thang đo tối đa
-        let percent = data.salinity / maxSalinity;
-        if (percent > 1) percent = 1;
-        if (percent < 0) percent = 0;
+        // Logic quay kim đồng hồ (0 - 20 phần nghìn)
+        let sal = data.salinity;
+        if (sal > 20) sal = 20; if (sal < 0) sal = 0;
+        // Map 0-20 to -90deg to 90deg
+        const angle = (sal / 20) * 180 - 90;
+        document.getElementById('gauge-needle').style.transform = `rotate(${angle}deg)`;
 
-        // Góc xoay: -90 độ (min) đến 90 độ (max)
-        let deg = (percent * 180) - 90;
-        document.getElementById('needle').style.transform = `rotate(${deg}deg)`;
-
-        // Xử lý Cảnh báo nguy hiểm
-        const alertBox = document.getElementById('danger-alert');
-        const alertDot = document.getElementById('alert-dot');
-
+        // Xử lý cảnh báo
+        const alertBox = document.getElementById('alert-box');
         if (data.is_danger) {
-            alertBox.style.display = 'block';
-            document.getElementById('danger-msg').innerText = data.alert;
-            alertDot.style.display = 'block';
+            alertBox.style.display = 'flex';
+            document.getElementById('alert-msg').innerText = data.alert;
         } else {
             alertBox.style.display = 'none';
-            alertDot.style.display = 'none';
         }
     } catch (e) {
-        console.log("Đang chờ kết nối cảm biến...");
+        console.log("Waiting for sensor...");
     }
 }
 
-// --- 3. LẤY THỜI TIẾT & THỦY TRIỀU (Từ API Backend) ---
-async function updateWeatherAndTide() {
+async function fetchWeather() {
     try {
-        // Gọi API kèm theo mã trạm hiện tại
-        const res = await fetch(`/api/weather-schedule?device_id=${currentStationId}`);
+        const res = await fetch('/api/weather-schedule?device_id=ST-01');
         const data = await res.json();
 
-        // Cập nhật lại tên trạm chính xác (từ Backend trả về)
-        document.getElementById('disp-loc').innerText = "Trạm: " + data.location_name;
+        document.getElementById('weather-temp').innerText = data.weather.temp + "°C";
+        document.getElementById('weather-desc').innerText = data.weather.desc;
 
-        // Render lại nội dung Tab Lịch Vụ
-        const calendarHTML = `
-            <div class="card">
-                <h2 style="color: var(--primary-color); margin-top:0"><i class="fas fa-cloud-sun"></i> Thời tiết thực</h2>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <span style="font-size: 40px; font-weight:bold;">${data.weather.temp}°C</span>
-                        <p style="margin:0; opacity:0.8;">${data.weather.desc}</p>
-                    </div>
-                    <i class="fas fa-sun" style="font-size:50px; color:orange;"></i>
-                </div>
-            </div>
+        document.getElementById('tide-level').innerText = data.tide.level;
+        document.getElementById('tide-advice').innerText = data.tide.advice;
 
-            <div class="card">
-                <h2 style="color: #0277bd; margin-top:0"><i class="fas fa-water"></i> Thủy triều & Nước</h2>
-                <p style="font-size: 16px; line-height: 1.6;">
-                    <b>Ngày:</b> ${data.tide.date}<br>
-                    <b>Trạng thái:</b> <span style="color:blue; font-weight:bold">${data.tide.status}</span><br>
-                    <b>Mực nước:</b> ${data.tide.level}<br>
-                    <hr>
-                    <b style="color: #2e7d32;">💡 Khuyến nghị:</b><br>
-                    ${data.tide.advice}
-                </p>
-            </div>
-        `;
-        document.getElementById('tab-calendar').innerHTML = calendarHTML;
+        // Đổi màu lời khuyên
+        const adviceEl = document.getElementById('tide-advice');
+        if (data.tide.color === 'red') adviceEl.style.color = '#ef4444';
+        else adviceEl.style.color = '#10b981';
 
-    } catch (e) { console.log("Lỗi lấy thời tiết: " + e); }
+    } catch (e) { console.log("Weather error"); }
 }
 
-// --- 4. LOGIC AI VISION ---
-async function runAI(input) {
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
+// === 4. TRỢ LÝ AI ===
+async function uploadImage() {
+    const file = document.getElementById('camera-input').files[0];
+    if (!file) return;
 
-        // Hiển thị ảnh xem trước
-        const reader = new FileReader();
-        reader.onload = e => document.getElementById('ai-img').src = e.target.result;
-        reader.readAsDataURL(file);
+    // Hiển thị giao diện chờ
+    const resultCard = document.getElementById('ai-result');
+    resultCard.style.display = 'block';
+    document.getElementById('preview-img').src = URL.createObjectURL(file);
 
-        // Hiển thị khung kết quả & cuộn xuống
-        const card = document.getElementById('ai-result-card');
-        card.style.display = 'block';
-        document.getElementById('ai-status').innerText = "Đang phân tích...";
-        document.getElementById('ai-status').style.color = "orange";
-        card.scrollIntoView({ behavior: 'smooth' });
+    const statusText = document.getElementById('ai-status');
+    const solutionText = document.getElementById('ai-solution');
 
-        // Đóng gói ảnh gửi lên Server
-        const formData = new FormData();
-        formData.append('file', file);
+    statusText.innerText = "Đang phân tích...";
+    statusText.style.color = "#f59e0b"; // Vàng
+    solutionText.innerText = "AI đang suy nghĩ...";
 
-        try {
-            const res = await fetch('/api/analyze-image', { method: 'POST', body: formData });
-            const data = await res.json();
+    // Scroll xuống kết quả
+    resultCard.scrollIntoView({ behavior: 'smooth' });
 
-            const isSafe = data.status === 'healthy';
-            document.getElementById('ai-status').innerText = isSafe ? "LÚA TỐT ✅" : "CÓ BỆNH ⚠️";
-            document.getElementById('ai-status').style.color = isSafe ? "green" : "red";
-            document.getElementById('ai-detail').innerText = data.msg + "\n" + (data.solution || "");
-        } catch (e) {
-            document.getElementById('ai-status').innerText = "Lỗi kết nối!";
+    // Gửi ảnh
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const res = await fetch('/api/analyze-image', { method: 'POST', body: formData });
+        const result = await res.json();
+
+        statusText.innerText = result.msg;
+        solutionText.innerText = result.solution;
+
+        // Đổi màu theo trạng thái
+        if (result.status === 'healthy') {
+            statusText.style.color = "#10b981"; // Xanh
+        } else if (result.status === 'sick') {
+            statusText.style.color = "#ef4444"; // Đỏ
+        } else {
+            statusText.style.color = "#6b7280"; // Xám (Unknown)
         }
+
+    } catch (e) {
+        statusText.innerText = "Lỗi kết nối AI";
+        statusText.style.color = "#ef4444";
     }
 }
