@@ -4,269 +4,206 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import datetime, random, requests, asyncio, math
-import json
-import os
+import datetime, json, os, requests, math
+from datetime import timedelta
 import google.generativeai as genai
 from PIL import Image
 import io
 
 app = FastAPI()
 
-# Cấu hình CORS
-app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
-)
-
-# Cấu hình đường dẫn tĩnh
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
-# === CẤU HÌNH AI (Thay Key của bạn vào đây) ===
+# === AI CONFIG ===
 GOOGLE_API_KEY = "AIzaSyAMlaUxEsQV1ilSwKMEgtQWqXWk877dZTE" 
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
-    # Dùng model ổn định nhất
     model = genai.GenerativeModel('gemini-flash-latest')
-except:
-    print("⚠️ Cảnh báo: Chưa cấu hình API Key hoặc lỗi kết nối AI")
+except: pass
 
-
-# 1. LOGIC LƯU TRỮ DỮ LIỆU (DATABASE MINI)
-
+# === DATABASE QUẢN LÝ FILE ===
 DB_FILE = "sensor_data.json"
 
-# Dữ liệu mặc định (Dùng khi mới chạy lần đầu)
-default_status = {
-    "salinity": 0, "temperature": 0, "ph": 0, 
-    "water_level": 120, "is_danger": False, "alert": ""
-}
+def create_station_template():
+    return {
+        "current": { "salinity": 0, "temperature": 0, "ph": 0, "water_level": 120, "is_danger": False, "alert": "Chờ dữ liệu..." },
+        "history": [] 
+    }
 
 def load_data():
-    """Đọc dữ liệu từ file JSON khi khởi động"""
+    default_data = {"stations": {"ST-01": create_station_template(), "ST-02": create_station_template()}}
     if os.path.exists(DB_FILE):
         try:
             with open(DB_FILE, "r") as f:
                 data = json.load(f)
-                print(f"✅ Đã khôi phục dữ liệu: {data}")
+                if "stations" not in data: return default_data
                 return data
-        except Exception as e:
-            print(f"⚠️ Lỗi đọc file data: {e}")
-    return default_status.copy()
+        except: return default_data
+    return default_data
 
 def save_data(data):
-    """Lưu dữ liệu vào file JSON mỗi khi có cập nhật"""
     try:
-        with open(DB_FILE, "w") as f:
-            json.dump(data, f)
-    except Exception as e:
-        print(f"⚠️ Không thể lưu dữ liệu: {e}")
+        with open(DB_FILE, "w") as f: json.dump(data, f, indent=4)
+    except: pass
 
-# Biến toàn cục (Load từ file ngay khi chạy)
-current_status = load_data()
+db = load_data()
 
-
-
-# 2. API GIAO DIỆN
-
+# === API GIAO DIỆN ===
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/admin", response_class=HTMLResponse)
 async def read_admin(request: Request):
-    return templates.TemplateResponse("admin.html", {"request": request})
+    if os.path.exists("admin.html"):
+        with open("admin.html", "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return "Không tìm thấy file Admin"
 
-# 3. API DỮ LIỆU THÔNG MINH
+# === API SENSOR ===
+@app.get("/api/sensor")
+async def get_sensor_current(device_id: str = "ST-01"):
+    if device_id not in db["stations"]:
+        db["stations"][device_id] = create_station_template()
+    return db["stations"][device_id]["current"]
 
-@app.get("/api/get-status")
-async def get_status():
-    return current_status
-
-# Class dữ liệu đầu vào (Cho phép thiếu trường water_level)
 class SensorData(BaseModel):
-    station_id: str
-    salinity: float
-    temperature: float
-    ph: float
-    # Logic mới: Nếu thiết bị cũ không gửi mực nước, tự động điền 120
-    water_level: float = 120.0 
+    station_id: str; salinity: float; temperature: float; ph: float; water_level: float
 
 @app.post("/api/update-sensor")
 async def update_sensor(data: SensorData):
-    global current_status
-    
-    # Logic cảnh báo đa điều kiện
-    is_danger = False
-    alert_msg = "Môi trường ổn định"
-    
-    # Điều kiện 1: Độ mặn cao
-    if data.salinity > 4.0:
-        is_danger = True
-        alert_msg = f"Nguy hiểm! Độ mặn cao ({data.salinity}‰)"
-    
-    # Điều kiện 2: Mực nước quá thấp (Dễ gây nóng nước và tăng mặn)
-    if data.water_level < 50:
-        is_danger = True
-        alert_msg = "Cảnh báo! Mực nước quá thấp (Cạn)"
-    
-    current_status = {
+    global db
+    sid = data.station_id
+    if sid not in db["stations"]: db["stations"][sid] = create_station_template()
+
+    is_danger, alert_msg = False, "Ổn định"
+    if data.salinity > 4.0: is_danger, alert_msg = True, f"Cảnh báo mặn: {data.salinity}‰"
+    if data.water_level < 50: is_danger, alert_msg = True, "Cảnh báo cạn nước"
+
+    db["stations"][sid]["current"] = {
         "salinity": round(data.salinity, 1),
         "temperature": round(data.temperature, 1),
         "ph": round(data.ph, 1),
         "water_level": round(data.water_level, 0),
-        "is_danger": is_danger,
-        "alert": alert_msg
+        "is_danger": is_danger, "alert": alert_msg
     }
     
-    # Tự động lưu xuống ổ cứng
-    save_data(current_status)
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    record = {"time": timestamp, "salinity": data.salinity, "temperature": data.temperature}
+    db["stations"][sid]["history"].append(record)
     
-    return {"status": "ok", "saved": True}
+    if len(db["stations"][sid]["history"]) > 5000:
+        db["stations"][sid]["history"].pop(0)
 
-# 4. API THỜI TIẾT
+    save_data(db)
+    return {"status": "ok"}
 
-LOCATIONS = {
-    "ST-01": {"name": "Sóc Trăng", "lat": 9.60, "lon": 105.97},
-    "BL-02": {"name": "Bạc Liêu", "lat": 9.29, "lon": 105.72}, 
-}
+# === API LỊCH SỬ ===
+@app.get("/api/sensor-history")
+async def get_history(device_id: str = "ST-01", range: str = "24h"):
+    if device_id not in db["stations"]: return {"labels": [], "salinity": [], "threshold": 4.0}
+    full_history = db["stations"][device_id]["history"]
+    if not full_history: return {"labels": [], "salinity": [], "threshold": 4.0}
 
-def get_real_weather(lat, lon):
-    try:
-        # Timeout 3s: Nếu mạng lag quá 3s thì tự cắt để không treo App
-        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&timezone=Asia%2FBangkok"
-        res = requests.get(url, timeout=3).json()
-        temp = res['current_weather']['temperature']
-        code = res['current_weather']['weathercode']
-        desc = "Nắng đẹp"
-        if code > 3: desc = "Có mây/Mưa"
-        return {"temp": temp, "desc": desc}
-    except:
-        # Fallback: Trả về dữ liệu giả lập nếu mất mạng
-        print("⚠️ Mất mạng: Đang dùng dữ liệu giả lập")
-        return {"temp": 30.5, "desc": "Giả lập (Offline)"}
+    if range == "24h":
+        recent = full_history[-24:]
+        return {
+            "labels": [h["time"].split(" ")[-1] for h in recent],
+            "salinity": [h["salinity"] for h in recent],
+            "threshold": 4.0
+        }
 
-def get_tide_forecast():
-    today = datetime.date.today()
-    cycle = math.sin(today.day * 0.5)
+    now = datetime.datetime.now()
+    delta = timedelta(days=7) if range == "7d" else timedelta(days=30)
+    start_time = now - delta
     
-    return {
-        "date": today.strftime("%d/%m/%Y"),
-        "status": "TRIỀU CƯỜNG" if cycle > 0.4 else "BÌNH THƯỜNG",
-        "level": "Cao (2.9m)" if cycle > 0.4 else "Thấp (1.1m)",
-        "color": "red" if cycle > 0.4 else "green",
-        "advice": "⚠️ Cần gia cố đê bao" if cycle > 0.4 else "✅ Có thể lấy nước"
-    }
+    filtered_labels = []
+    filtered_values = []
+    step = 4 if range == "30d" else 1 
+
+    for i, record in enumerate(full_history):
+        try:
+            rec_time = datetime.datetime.strptime(record["time"], "%Y-%m-%d %H:%M")
+            if rec_time >= start_time:
+                if i % step == 0:
+                    filtered_labels.append(record["time"])
+                    filtered_values.append(record["salinity"])
+        except: continue
+
+    return {"labels": filtered_labels, "salinity": filtered_values, "threshold": 4.0}
+
+# === [QUAN TRỌNG] API THỜI TIẾT 30 NGÀY TỪ INTERNET ===
+LOCATIONS = {"ST-01": {"lat": 9.60, "lon": 105.97}, "ST-02": {"lat": 9.29, "lon": 105.72}}
 
 @app.get("/api/weather-schedule")
-async def get_weather_schedule(device_id: str = "ST-01"):
+async def get_weather(device_id: str = "ST-01"):
     loc = LOCATIONS.get(device_id, LOCATIONS["ST-01"])
-    weather = get_real_weather(loc['lat'], loc['lon'])
-    tide = get_tide_forecast()
-    return {
-        "location_name": loc['name'], # Khớp với frontend cũ của bạn
-        "weather": weather,
-        "tide": tide
-    }
-
-# 5. API AI (XỬ LÝ LỖI THÔNG MINH)
-
-@app.post("/api/analyze-image")
-async def analyze_image(file: UploadFile = File(...)):
-    # Kiểm tra xem có Key chưa
-    if not GOOGLE_API_KEY:
-        return {"status": "error", "msg": "Chưa có API Key", "solution": "Liên hệ Admin cấu hình lại."}
-
     try:
-        contents = await file.read()
-        image = Image.open(io.BytesIO(contents))
-        prompt = """
-        Đóng vai là một Chuyên gia Nông nghiệp và Thủy sản hàng đầu tại Đồng bằng sông Cửu Long.
-        Nhiệm vụ của bạn là phân tích hình ảnh đầu vào để hỗ trợ nông dân chẩn đoán bệnh cho: LÚA, TÔM, hoặc CÁ.
-
-        Hãy thực hiện các bước suy luận sau:
-        1. NHẬN DIỆN: Đây là Lúa, Tôm, hay Cá? (Nếu không phải 3 loại này, trả về unknown).
-        2. QUAN SÁT TRIỆU CHỨNG:
-           - Nếu là Lúa: Tìm các đốm nâu (đạo ôn), vệt vàng (cháy bìa lá), sâu cuốn lá, rầy nâu...
-           - Nếu là Tôm: Quan sát màu sắc gan tụy, ruột, vỏ (đốm trắng), cơ thịt (đục cơ).
-           - Nếu là Cá: Quan sát vây, mang, da (xuất huyết, nấm, lở loét).
-        3. KẾT LUẬN: Đưa ra chẩn đoán chính xác nhất.
-
-        Yêu cầu trả về kết quả dưới dạng JSON thuần túy (tuyệt đối không dùng Markdown, không dùng ```json):
-        {
-            "status": "healthy" (nếu khỏe) hoặc "sick" (nếu có dấu hiệu bệnh),
-            "msg": "Tên đối tượng + Tên bệnh cụ thể (Ví dụ: 'Tôm thẻ bị hoại tử gan tụy', 'Lúa bị đạo ôn cổ bông')",
-            "solution": "Giải pháp kỹ thuật ngắn gọn, hiệu quả (Dưới 20 từ, ví dụ: 'Thay nước, tạt khoáng', 'Phun thuốc Beam 75WP')"
-        }
-
-        Trường hợp không xác định được hoặc ảnh mờ, hãy trả về:
-        {
-            "status": "unknown", 
-            "msg": "Ảnh không rõ ràng hoặc không đúng đối tượng", 
-            "solution": "Vui lòng chụp lại cận cảnh vùng bị bệnh"
-        }
-        """
-
-        response = model.generate_content([prompt, image])
+        # Gọi API lấy: 30 ngày quá khứ (past_days=30) + 7 ngày dự báo (forecast_days=7)
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={loc['lat']}&longitude={loc['lon']}&daily=temperature_2m_max&past_days=30&forecast_days=7&current_weather=true&timezone=Asia%2FBangkok"
         
-        # Làm sạch kết quả trả về (đề phòng AI vẫn thêm markdown)
-        text_res = response.text.replace("```json", "").replace("```", "").strip()
-        return json.loads(text_res)
+        res = requests.get(url, timeout=5).json()
+        
+        # 1. Dữ liệu hiện tại
+        current = res.get("current_weather", {})
+        temp_now = current.get("temperature", "--")
+        code = current.get("weathercode", 0)
+        desc = "Nắng đẹp" if code <= 3 else "Có mưa/Mây"
+        
+        # 2. Dữ liệu biểu đồ (37 ngày)
+        daily = res.get("daily", {})
+        chart_dates = daily.get("time", []) 
+        chart_temps = daily.get("temperature_2m_max", [])
+        
+        # 3. Tính toán Triều (Giả lập theo ngày để có data vẽ)
+        tide_levels = []
+        for i in range(len(chart_dates)):
+            val = 2.0 + math.sin(i * 0.2) * 1.2 # Tạo hình sóng triều cường
+            tide_levels.append(round(abs(val), 1))
 
-    except Exception as e:
-        print(f"❌ Lỗi AI: {e}")
         return {
-            "status": "sick", 
-            "msg": "⚠️ Lỗi kết nối AI", 
-            "solution": "Vui lòng kiểm tra lại mạng wifi/4G."
+            "status": "ok",
+            "weather": {
+                "temp": temp_now,
+                "desc": desc,
+                "chart_dates": chart_dates,   
+                "chart_temps": chart_temps    
+            },
+            "tide": {
+                "level": f"{tide_levels[-1]}m", # Lấy ngày cuối
+                "advice": "Triều đang lên" if tide_levels[-1] > 2.0 else "Bình thường",
+                "color": "red" if tide_levels[-1] > 2.5 else "green",
+                "chart_data": tide_levels     
+            }
+        }
+    except Exception as e:
+        print("Lỗi Weather:", e)
+        return {
+            "status": "error",
+            "weather": { "temp": 30, "desc": "Offline", "chart_dates": [], "chart_temps": [] },
+            "tide": { "level": "--", "advice": "--", "color": "gray", "chart_data": [] }
         }
 
-# In thông báo khi chạy
-print("🚀 Backend MekongSight AI (Logic V2) đang chạy...")
-
-
+# === CÁC API KHÁC ===
 USER_DB_FILE = "users.json"
-
-def load_users():
-    """Hàm đọc danh sách người dùng từ file"""
-    if os.path.exists(USER_DB_FILE):
-        try:
-            with open(USER_DB_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"⚠️ Lỗi đọc file user: {e}")
-    
-    # Nếu file không tồn tại, tạo tài khoản mặc định
-    default_users = [
-        {"username": "admin", "password": "123", "name": "Admin Mặc định", "role": "admin"}
-    ]
-    # Tự động tạo file nếu chưa có
-    try:
-        with open(USER_DB_FILE, "w", encoding="utf-8") as f:
-            json.dump(default_users, f, indent=4, ensure_ascii=False)
-    except: pass
-    
-    return default_users
-
-class LoginData(BaseModel):
-    username: str
-    password: str
+class LoginData(BaseModel): username: str; password: str
 
 @app.post("/api/login")
 async def login(data: LoginData):
-    # 1. Đọc danh sách mới nhất từ file json
-    users = load_users()
-    
-    # 2. Duyệt qua từng người để tìm tài khoản khớp
-    for user in users:
-        if user['username'] == data.username and user['password'] == data.password:
-            # Tìm thấy! Trả về thành công kèm tên người dùng
-            return {
-                "status": "ok", 
-                "msg": f"Xin chào, {user['name']}!", 
-                "username": user['username'],
-                "role": user['role']
-            }
-            
-    # 3. Quét hết danh sách mà không khớp ai
-    return {"status": "error", "msg": "Sai tài khoản hoặc mật khẩu!"}
+    if os.path.exists(USER_DB_FILE):
+        with open(USER_DB_FILE, "r", encoding="utf-8") as f: users = json.load(f)
+        for u in users:
+            if u['username'] == data.username and u['password'] == data.password:
+                return {"status": "ok", "msg": u['name'], "station_id": u.get("station_id", "ST-01")}
+    return {"status": "error", "msg": "Sai thông tin"}
+
+@app.post("/api/analyze-image")
+async def analyze_image(file: UploadFile = File(...)):
+    if not GOOGLE_API_KEY: return {"status": "error", "msg": "Thiếu API Key"}
+    try:
+        img = Image.open(io.BytesIO(await file.read()))
+        res = model.generate_content(["Phân tích bệnh. JSON: {status, msg, solution}", img])
+        return json.loads(res.text.replace("```json", "").replace("```", "").strip())
+    except: return {"status": "unknown", "msg": "Lỗi AI", "solution": "Thử lại"}

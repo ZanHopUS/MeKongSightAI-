@@ -1,3 +1,6 @@
+/* =========================================
+   1. VARIABLES & RESET
+   ========================================= */
 :root {
     --primary: #10b981;
     --primary-dark: #059669;
@@ -26,7 +29,15 @@ body {
     overflow: hidden;
 }
 
-/* === LOGIN PAGE (HERO STYLE) === */
+ul li,
+p,
+span {
+    line-height: 1.6;
+}
+
+/* =========================================
+   2. LOGIN PAGE
+   ========================================= */
 .login-wrapper {
     position: fixed;
     top: 0;
@@ -53,7 +64,6 @@ body {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-/* PC View Login */
 @media (min-width: 768px) {
     .login-content {
         flex-direction: row;
@@ -181,6 +191,23 @@ body {
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
 
+.error-msg {
+    color: var(--danger);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    display: none;
+}
+
+.support-text {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 20px;
+}
+
+/* =========================================
+   3. COMPONENTS (Buttons, Cards, Nav)
+   ========================================= */
 .btn-primary {
     width: 100%;
     padding: 12px;
@@ -201,28 +228,48 @@ body {
     background: var(--primary-dark);
 }
 
-.error-msg {
-    color: var(--danger);
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-    display: none;
+.btn-outline {
+    border: 1px solid #e5e7eb;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
-.support-text {
-    text-align: center;
-    font-size: 0.8rem;
+.btn-outline:hover {
+    background: #f3f4f6;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 14px;
+    font-weight: 700;
     color: var(--text-light);
-    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 10px;
 }
 
-/* === MAIN APP LAYOUT === */
+/* =========================================
+   4. MAIN APP LAYOUT
+   ========================================= */
 .app-container {
     display: flex;
     height: 100vh;
     position: relative;
 }
 
-/* Sidebar (PC) */
+/* Sidebar */
 .sidebar {
     width: 260px;
     background: var(--white);
@@ -270,7 +317,7 @@ body {
 
 .nav-link {
     display: flex;
-    items: center;
+    align-items: center;
     gap: 12px;
     padding: 12px 15px;
     color: var(--text-light);
@@ -350,24 +397,6 @@ body {
     border-radius: 20px;
 }
 
-/* Cards */
-.card {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--card-shadow);
-    margin-bottom: 20px;
-}
-
-.alert-card {
-    background: #fef2f2;
-    border-left: 4px solid var(--danger);
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    color: var(--danger);
-}
-
 /* Dashboard Grid */
 .dashboard-grid {
     display: grid;
@@ -379,6 +408,10 @@ body {
         grid-template-columns: 300px 1fr;
     }
 }
+
+/* =========================================
+   5. SPECIFIC WIDGETS
+   ========================================= */
 
 /* Gauge */
 .gauge-card {
@@ -492,23 +525,25 @@ body {
     font-weight: bold;
 }
 
-/* AI & Weather */
-.weather-card-main {
-    background: linear-gradient(to right, #3b82f6, #2563eb);
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 20px;
+/* AI Analysis */
+.ai-summary-card {
+    background: #ecfdf5;
+    border-left: 5px solid #10b981;
 }
 
-.weather-icon {
-    font-size: 3rem;
-    opacity: 0.8;
+.ai-summary-card.red {
+    background: #fef2f2;
+    border-color: #ef4444;
 }
 
-.temp-big {
-    font-size: 2.5rem;
-    font-weight: bold;
+.ai-summary-card.orange {
+    background: #fffbeb;
+    border-color: #f59e0b;
+}
+
+.ai-summary-card ul {
+    margin-top: 10px;
+    padding-left: 20px;
 }
 
 .ai-container {
@@ -556,7 +591,143 @@ body {
     border-left: 4px solid var(--primary);
 }
 
-/* Mobile Nav */
+/* Event Log */
+.event-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0 12px;
+}
+
+.muted {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.event-log {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 260px;
+    overflow: auto;
+}
+
+.event-log li {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #eef2f7;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: #fff;
+}
+
+.event-time {
+    font-family: monospace;
+    font-size: 12px;
+    color: #6b7280;
+    min-width: 70px;
+}
+
+.event-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 999px;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.badge-green {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.badge-orange {
+    background: #fffbeb;
+    color: #5a300f;
+}
+
+.badge-red {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.badge-blue {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.event-msg {
+    flex: 1;
+    font-size: 14px;
+}
+
+.quick-tips {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+.quick-tips li {
+    margin-bottom: 8px;
+}
+
+/* =========================================
+   6. CHARTS (Fixes included)
+   ========================================= */
+.full-width-chart {
+    width: 100%;
+    grid-column: 1 / -1;
+    margin-top: 24px;
+    padding: 20px 24px;
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-container-box {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+}
+
+.full-width-chart canvas {
+    width: 100% !important;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.chart-range {
+    display: flex;
+    gap: 8px;
+}
+
+.range-btn {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.range-btn.active {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+/* =========================================
+   7. MOBILE NAVIGATION
+   ========================================= */
 .mobile-nav {
     position: fixed;
     bottom: 0;

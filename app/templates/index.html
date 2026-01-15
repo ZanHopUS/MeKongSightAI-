@@ -44,15 +44,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="usage-guide">
-                    <h3><i class="fas fa-book-open"></i> Hướng dẫn nhanh:</h3>
-                    <ul>
-                        <li>1. Đăng nhập bằng tài khoản được cấp (VD: user1 / 123).</li>
-                        <li>2. Xem các chỉ số môi trường ở tab <b>Giám sát</b>.</li>
-                        <li>3. Chụp ảnh cây/con nghi bệnh ở tab <b>AI Vision</b>.</li>
-                    </ul>
-                </div>
             </div>
 
             <div class="form-section">
@@ -77,9 +68,7 @@
                         Truy cập Hệ thống <i class="fas fa-arrow-right"></i>
                     </button>
 
-                    <div class="support-text">
-                        Cần hỗ trợ? Liên hệ: <b>0909.xxx.xxx</b>
-                    </div>
+                    <div class="support-text">Hotline hỗ trợ: 0909.xxx.xxx</div>
                 </div>
             </div>
         </div>
@@ -115,17 +104,17 @@
         <main class="content-area">
 
             <section id="page-monitor" class="page-section active">
+
                 <div class="section-header">
                     <h2>Giám sát Môi trường</h2>
                     <span class="date-now" id="current-date">--/--/----</span>
                 </div>
 
-                <div id="alert-box" class="alert-card" style="display: none;">
-                    <div class="alert-icon"><i class="fas fa-bell"></i></div>
-                    <div class="alert-content">
-                        <h4>Cảnh báo Quan trọng!</h4>
-                        <p id="alert-msg">...</p>
-                    </div>
+                <div class="card ai-summary-card" style="margin-bottom: 20px;">
+                    <div class="card-title">🤖 Đánh giá hiện tại</div>
+                    <h3 id="ai-status-text" style="margin-bottom: 10px;">Đang phân tích...</h3>
+                    <ul id="ai-reasons"></ul>
+                    <ul id="ai-advice" style="margin-top: 5px; font-weight: 500;"></ul>
                 </div>
 
                 <div class="dashboard-grid">
@@ -140,6 +129,24 @@
                             <div class="gauge-value" id="val-sal">0.0</div>
                             <div class="gauge-unit">Phần nghìn (‰)</div>
                         </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🕒 Nhật ký sự kiện</div>
+                        <div class="event-toolbar">
+                            <button class="btn-outline" onclick="clearEventLog()">Xóa nhật ký</button>
+                            <span class="muted" id="event-count">0 sự kiện</span>
+                        </div>
+                        <ul id="event-log" class="event-log"></ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📌 Gợi ý nhanh</div>
+                        <ul class="quick-tips">
+                            <li>✔ Theo dõi độ mặn lúc triều cường.</li>
+                            <li>✔ Không lấy nước khi vượt ngưỡng > 4‰.</li>
+                            <li>✔ So sánh dữ liệu theo ngày để thấy xu hướng.</li>
+                        </ul>
                     </div>
 
                     <div class="metrics-container">
@@ -166,46 +173,68 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card full-width-chart">
+                    <div class="chart-header">
+                        <div class="card-title">📈 Xu hướng độ mặn theo thời gian</div>
+                        <div class="chart-range">
+                            <button class="range-btn active" onclick="changeRange('24h')">24h</button>
+                            <button class="range-btn" onclick="changeRange('7d')">7 ngày</button>
+                            <button class="range-btn" onclick="changeRange('30d')">1 tháng</button>
+                        </div>
+                    </div>
+                    <div class="chart-container-box">
+                        <canvas id="salinityChart"></canvas>
+                    </div>
+                </div>
             </section>
 
-            <section id="page-weather" class="page-section" style="display: none;">
+            <section id="page-weather" class="page-section">
                 <div class="section-header">
                     <h2>Lịch vụ & Thời tiết</h2>
                 </div>
 
-                <div class="weather-grid">
-                    <div class="card weather-card-main">
-                        <div class="weather-icon"><i class="fas fa-cloud-sun"></i></div>
-                        <div class="weather-info">
-                            <h3>Thời tiết hiện tại</h3>
-                            <div class="temp-big" id="weather-temp">--°C</div>
-                            <p id="weather-desc">Đang cập nhật dữ liệu...</p>
-                            <p class="location"><i class="fas fa-map-marker-alt"></i> Sóc Trăng, VN</p>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-title">📍 Thời tiết hiện tại</div>
+                        <div style="text-align: center; margin-top: 10px;">
+                            <h1 id="weather-temp" style="font-size: 3rem; color: var(--text-main);">--°C</h1>
+                            <p id="weather-desc" style="font-size: 1.2rem; color: var(--text-light);">--</p>
                         </div>
                     </div>
 
-                    <div class="card tide-card-main">
-                        <div class="tide-header">
-                            <i class="fas fa-water"></i> Dự báo Thủy triều
+                    <div class="card">
+                        <div class="card-title">🌊 Thủy triều hôm nay</div>
+                        <div style="text-align: center; margin-top: 10px;">
+                            <h2 id="tide-level" style="font-size: 2rem; color: var(--secondary);">--</h2>
+                            <p id="tide-advice" style="font-weight: 600; margin-top: 5px;">--</p>
                         </div>
-                        <div class="tide-body">
-                            <div class="tide-level" id="tide-level">--</div>
-                            <div class="tide-advice" id="tide-advice">--</div>
-                        </div>
+                    </div>
+                </div>
+
+                <div class="card full-width-chart">
+                    <div class="card-title">🌡️ Dự báo Nhiệt độ (7 ngày tới)</div>
+                    <div class="chart-container-box">
+                        <canvas id="tempChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card full-width-chart">
+                    <div class="card-title">🌊 Dự báo Mực triều</div>
+                    <div class="chart-container-box">
+                        <canvas id="tideChart"></canvas>
                     </div>
                 </div>
             </section>
 
-            <section id="page-ai" class="page-section" style="display: none;">
+            <section id="page-ai" class="page-section">
                 <div class="section-header">
                     <h2>Trợ lý AI Chẩn đoán</h2>
                 </div>
 
                 <div class="ai-container">
                     <div class="card ai-upload-card">
-                        <div class="ai-icon-wrapper">
-                            <i class="fas fa-robot"></i>
-                        </div>
+                        <div class="ai-icon-wrapper"><i class="fas fa-robot"></i></div>
                         <h3>Bác sĩ Nông nghiệp AI</h3>
                         <p>Chụp ảnh Lúa, Tôm, Cá để phát hiện bệnh sớm.</p>
 
@@ -231,21 +260,17 @@
         </main>
 
         <div class="mobile-nav">
-            <div class="mobile-item active" onclick="switchPage('monitor')" id="mob-monitor">
-                <i class="fas fa-chart-line"></i>
+            <div class="mobile-item active" onclick="switchPage('monitor')" id="mob-monitor"><i
+                    class="fas fa-chart-line"></i></div>
+            <div class="mobile-item" onclick="switchPage('weather')" id="mob-weather"><i
+                    class="fas fa-calendar-alt"></i></div>
+            <div class="mobile-item center-btn" onclick="switchPage('ai')" id="mob-ai"><i class="fas fa-camera"></i>
             </div>
-            <div class="mobile-item" onclick="switchPage('weather')" id="mob-weather">
-                <i class="fas fa-calendar-alt"></i>
-            </div>
-            <div class="mobile-item center-btn" onclick="switchPage('ai')" id="mob-ai">
-                <i class="fas fa-camera"></i>
-            </div>
-            <div class="mobile-item" onclick="handleLogout()">
-                <i class="fas fa-sign-out-alt"></i>
-            </div>
+            <div class="mobile-item" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i></div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/js/script.js"></script>
 </body>
 

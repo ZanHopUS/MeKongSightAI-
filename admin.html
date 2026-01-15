@@ -41,7 +41,6 @@
             gap: 20px;
         }
 
-        /* HEADER */
         header {
             display: flex;
             justify-content: space-between;
@@ -70,7 +69,6 @@
             box-shadow: 0 0 10px currentColor;
         }
 
-        /* CARDS */
         .card {
             background: var(--card-bg);
             border-radius: 16px;
@@ -89,7 +87,6 @@
             gap: 10px;
         }
 
-        /* BUTTONS GRID */
         .scenario-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -136,7 +133,6 @@
             background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
         }
 
-        /* SLIDERS CONTROL */
         .control-group {
             margin-bottom: 25px;
         }
@@ -178,7 +174,6 @@
             transform: scale(1.2);
         }
 
-        /* SWITCH TOGGLE */
         .toggle-container {
             display: flex;
             justify-content: space-between;
@@ -233,7 +228,6 @@
             transform: translateX(30px);
         }
 
-        /* LOG */
         #console-log {
             background: #000;
             color: #0f0;
@@ -250,6 +244,19 @@
             margin-bottom: 5px;
             border-bottom: 1px solid #222;
             padding-bottom: 2px;
+        }
+
+        /* Style cho Dropdown chọn trạm */
+        .station-selector {
+            width: 100%;
+            padding: 12px;
+            background: #4b5563;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -268,68 +275,58 @@
         </header>
 
         <div class="card">
-            <h3><i class="fas fa-bolt"></i> Kịch bản Nhanh (Scenarios)</h3>
+            <h3><i class="fas fa-satellite-dish"></i> Chọn Trạm Điều Khiển</h3>
+            <select id="station-select" class="station-selector">
+                <option value="ST-01">📡 Trạm ST-01 (Của User 1)</option>
+                <option value="ST-02">📡 Trạm ST-02 (Của User 2)</option>
+            </select>
+
+            <h3><i class="fas fa-bolt"></i> Kịch bản Nhanh</h3>
             <div class="scenario-grid">
-                <button class="btn-scenario sc-normal" onclick="applyScenario('normal')">
-                    <i class="fas fa-check-circle fa-2x"></i> ỔN ĐỊNH
-                </button>
-                <button class="btn-scenario sc-warn" onclick="applyScenario('warning')">
-                    <i class="fas fa-exclamation-triangle fa-2x"></i> CHỚM MẶN
-                </button>
-                <button class="btn-scenario sc-danger" onclick="applyScenario('danger')">
-                    <i class="fas fa-radiation fa-2x"></i> SỐC MẶN!
-                </button>
-                <button class="btn-scenario sc-rain" onclick="applyScenario('rain')">
-                    <i class="fas fa-cloud-showers-heavy fa-2x"></i> MƯA LỚN
-                </button>
+                <button class="btn-scenario sc-normal" onclick="applyScenario('normal')"><i
+                        class="fas fa-check-circle fa-2x"></i> ỔN ĐỊNH</button>
+                <button class="btn-scenario sc-warn" onclick="applyScenario('warning')"><i
+                        class="fas fa-exclamation-triangle fa-2x"></i> CHỚM MẶN</button>
+                <button class="btn-scenario sc-danger" onclick="applyScenario('danger')"><i
+                        class="fas fa-radiation fa-2x"></i> SỐC MẶN!</button>
+                <button class="btn-scenario sc-rain" onclick="applyScenario('rain')"><i
+                        class="fas fa-cloud-showers-heavy fa-2x"></i> MƯA LỚN</button>
             </div>
         </div>
 
         <div class="card">
-            <h3><i class="fas fa-sliders-h"></i> Tinh chỉnh Thủ công (Fine Tuning)</h3>
+            <h3><i class="fas fa-sliders-h"></i> Tinh chỉnh Thủ công</h3>
 
             <div class="control-group">
-                <div class="control-header">
-                    <span><i class="fas fa-water" style="color:var(--warning)"></i> Độ mặn (Salinity)</span>
-                    <span class="control-val" id="disp-sal">0 ‰</span>
-                </div>
+                <div class="control-header"><span><i class="fas fa-water" style="color:var(--warning)"></i> Độ
+                        mặn</span><span class="control-val" id="disp-sal">0 ‰</span></div>
                 <input type="range" id="rng-sal" min="0" max="20" step="0.1" value="0" oninput="manualUpdate()">
             </div>
 
             <div class="control-group">
-                <div class="control-header">
-                    <span><i class="fas fa-thermometer-half" style="color:var(--danger)"></i> Nhiệt độ (Temp)</span>
-                    <span class="control-val" id="disp-temp">30 °C</span>
-                </div>
+                <div class="control-header"><span><i class="fas fa-thermometer-half" style="color:var(--danger)"></i>
+                        Nhiệt độ</span><span class="control-val" id="disp-temp">30 °C</span></div>
                 <input type="range" id="rng-temp" min="15" max="45" step="0.5" value="30" oninput="manualUpdate()">
             </div>
 
             <div class="control-group">
-                <div class="control-header">
-                    <span><i class="fas fa-flask" style="color:var(--success)"></i> Độ pH</span>
-                    <span class="control-val" id="disp-ph">7.5</span>
-                </div>
+                <div class="control-header"><span><i class="fas fa-flask" style="color:var(--success)"></i> Độ
+                        pH</span><span class="control-val" id="disp-ph">7.5</span></div>
                 <input type="range" id="rng-ph" min="3" max="10" step="0.1" value="7.5" oninput="manualUpdate()">
             </div>
 
             <div class="control-group">
-                <div class="control-header">
-                    <span><i class="fas fa-ruler-vertical" style="color:var(--accent)"></i> Mực nước (Water
-                        Level)</span>
-                    <span class="control-val" id="disp-water">120 cm</span>
-                </div>
+                <div class="control-header"><span><i class="fas fa-ruler-vertical" style="color:var(--accent)"></i> Mực
+                        nước</span><span class="control-val" id="disp-water">120 cm</span></div>
                 <input type="range" id="rng-water" min="0" max="200" step="5" value="120" oninput="manualUpdate()">
             </div>
 
             <div class="toggle-container">
-                <div>
-                    <b style="color:white">Chế độ "Sống" (Auto-Drift)</b>
-                    <div style="font-size: 13px; opacity: 0.7;">Tự động dao động thông số nhẹ để giống thực tế</div>
+                <div><b style="color:white">Chế độ "Sống" (Auto-Drift)</b>
+                    <div style="font-size: 13px; opacity: 0.7;">Tự động dao động thông số</div>
                 </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="auto-drift" onchange="toggleDrift()">
-                    <span class="slider-switch"></span>
-                </label>
+                <label class="toggle-switch"><input type="checkbox" id="auto-drift" onchange="toggleDrift()"><span
+                        class="slider-switch"></span></label>
             </div>
         </div>
 
@@ -344,9 +341,10 @@
     <script>
         let driftInterval = null;
 
-        // 1. Hàm gửi dữ liệu cốt lõi (Đã nâng cấp 4 tham số)
         async function sendData(s, t, p, w) {
-            // Cập nhật giao diện
+            // Lấy ID trạm từ dropdown
+            const stationId = document.getElementById('station-select').value;
+
             document.getElementById('rng-sal').value = s;
             document.getElementById('rng-temp').value = t;
             document.getElementById('rng-ph').value = p;
@@ -357,13 +355,12 @@
             document.getElementById('disp-ph').innerText = parseFloat(p).toFixed(1);
             document.getElementById('disp-water').innerText = parseInt(w) + " cm";
 
-            // Gửi API
             const payload = {
-                station_id: "ADMIN-GOD",
+                station_id: stationId, // Gửi đúng trạm
                 salinity: parseFloat(s),
                 temperature: parseFloat(t),
                 ph: parseFloat(p),
-                water_level: parseFloat(w) // Gửi thêm mực nước
+                water_level: parseFloat(w)
             };
 
             try {
@@ -371,35 +368,26 @@
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                log(`Sent: Sal=${s} | Temp=${t} | Water=${w}cm`);
-            } catch (e) {
-                log("ERROR: Connection failed!");
-            }
+                log(`[${stationId}] Sent: Sal=${s} | Water=${w}cm`);
+            } catch (e) { log("ERROR: Connection failed!"); }
         }
 
-        // 2. Xử lý khi kéo tay
         function manualUpdate() {
             const s = document.getElementById('rng-sal').value;
             const t = document.getElementById('rng-temp').value;
             const p = document.getElementById('rng-ph').value;
-            const w = document.getElementById('rng-water').value; // Lấy giá trị mực nước
+            const w = document.getElementById('rng-water').value;
             sendData(s, t, p, w);
         }
 
-        // 3. Kịch bản nhanh (Đã thêm thông số mực nước)
         function applyScenario(type) {
-            if (document.getElementById('auto-drift').checked) {
-                document.getElementById('auto-drift').click(); // Tắt auto nếu đang bật
-            }
-
-            // Định dạng: Độ mặn, Nhiệt độ, pH, Mực nước
-            if (type === 'normal') sendData(1.5, 29.5, 7.5, 120); // Ổn định
-            if (type === 'warning') sendData(3.8, 32.0, 7.0, 100); // Nước bắt đầu cạn, hơi mặn
-            if (type === 'danger') sendData(12.5, 36.5, 4.5, 40);  // Nước cạn kiệt, rất mặn và nóng
-            if (type === 'rain') sendData(0.2, 26.0, 6.5, 160);    // Mưa: Nước dâng cao, mát, ngọt
+            if (document.getElementById('auto-drift').checked) document.getElementById('auto-drift').click();
+            if (type === 'normal') sendData(1.5, 29.5, 7.5, 120);
+            if (type === 'warning') sendData(3.8, 32.0, 7.0, 100);
+            if (type === 'danger') sendData(12.5, 36.5, 4.5, 40);
+            if (type === 'rain') sendData(0.2, 26.0, 6.5, 160);
         }
 
-        // 4. Chế độ Tự động dao động
         function toggleDrift() {
             const isOne = document.getElementById('auto-drift').checked;
             if (isOne) {
@@ -410,14 +398,11 @@
                     let p = parseFloat(document.getElementById('rng-ph').value);
                     let w = parseFloat(document.getElementById('rng-water').value);
 
-                    // Dao động nhẹ
                     s += (Math.random() - 0.5) * 0.2;
                     t += (Math.random() - 0.5) * 0.2;
-                    p += (Math.random() - 0.5) * 0.1;
-                    w += (Math.random() - 0.5) * 2; // Mực nước dao động biên độ lớn hơn chút
+                    w += (Math.random() - 0.5) * 2;
 
-                    if (s < 0) s = 0; if (t < 10) t = 10; if (p < 0) p = 0; if (w < 0) w = 0;
-
+                    if (s < 0) s = 0; if (w < 0) w = 0;
                     sendData(s.toFixed(2), t.toFixed(2), p.toFixed(2), w.toFixed(0));
                 }, 2000);
             } else {
@@ -432,7 +417,6 @@
             box.innerHTML = `<div class="log-entry">[${time}] ${msg}</div>` + box.innerHTML;
         }
     </script>
-
 </body>
 
 </html>

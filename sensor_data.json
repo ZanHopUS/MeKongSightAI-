@@ -1,1 +1,272 @@
-{"salinity": 1.5, "temperature": 29.5, "ph": 7.5, "water_level": 120.0, "is_danger": false, "alert": "M\u00f4i tr\u01b0\u1eddng \u1ed5n \u0111\u1ecbnh"}
+{
+    "stations": {
+        "ST-01": {
+            "current": {
+                "salinity": 3.8,
+                "temperature": 32.0,
+                "ph": 7.0,
+                "water_level": 100.0,
+                "is_danger": false,
+                "alert": "\u1ed4n \u0111\u1ecbnh"
+            },
+            "history": [
+                {
+                    "time": "2026-01-15 12:26",
+                    "salinity": 1.5,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 12:26",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 12.5,
+                    "temperature": 36.5
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.5,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.5,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.5,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.5,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.6,
+                    "temperature": 29.59
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.58,
+                    "temperature": 29.47
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.63,
+                    "temperature": 29.44
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.51,
+                    "temperature": 29.54
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.42,
+                    "temperature": 29.48
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.4,
+                    "temperature": 29.52
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.38,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.48,
+                    "temperature": 29.47
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.44,
+                    "temperature": 29.56
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.5,
+                    "temperature": 29.57
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.52,
+                    "temperature": 29.54
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.42,
+                    "temperature": 29.41
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.35,
+                    "temperature": 29.42
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.49,
+                    "temperature": 29.59
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.57,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.54,
+                    "temperature": 29.4
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.43,
+                    "temperature": 29.45
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.42,
+                    "temperature": 29.48
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.44,
+                    "temperature": 29.53
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.48,
+                    "temperature": 29.49
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.41,
+                    "temperature": 29.44
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.43,
+                    "temperature": 29.59
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.35,
+                    "temperature": 29.54
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.33,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.25,
+                    "temperature": 29.44
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.36,
+                    "temperature": 29.57
+                },
+                {
+                    "time": "2026-01-15 12:27",
+                    "salinity": 1.43,
+                    "temperature": 29.42
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 1.48,
+                    "temperature": 29.48
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 1.51,
+                    "temperature": 29.42
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 1.58,
+                    "temperature": 29.45
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 1.56,
+                    "temperature": 29.47
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 1.69,
+                    "temperature": 29.47
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 1.66,
+                    "temperature": 29.57
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 1.63,
+                    "temperature": 29.56
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 12.5,
+                    "temperature": 36.5
+                },
+                {
+                    "time": "2026-01-15 12:28",
+                    "salinity": 0.2,
+                    "temperature": 26.0
+                },
+                {
+                    "time": "2026-01-15 12:31",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                }
+            ]
+        },
+        "ST-02": {
+            "current": {
+                "salinity": 0,
+                "temperature": 0,
+                "ph": 0,
+                "water_level": 120,
+                "is_danger": false,
+                "alert": "Ch\u1edd d\u1eef li\u1ec7u..."
+            },
+            "history": []
+        }
+    }
+}
