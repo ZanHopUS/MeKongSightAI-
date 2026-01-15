@@ -1,22 +1,28 @@
-// === CẤU HÌNH DỮ LIỆU NÔNG NGHIỆP ===
+// MEKONG SIGHT AI - ENHANCED FRONTEND
+
+// === CONFIGURATION ===
 const FARMING_DATA = {
     'rice': {
         name: "Vụ Lúa",
         varieties: {
             'st25': {
                 name: "Lúa ST24/ST25 (Chịu mặn)",
-                rules: {
-                    salinity: { max: 4.0, msg: "Mặn cao > 4‰. Nguy hiểm cho lúa trổ bông." },
-                    ph: { min: 5.5, max: 7.5, msg: "pH đất không ổn định." },
-                    water: { min: 5, max: 20, msg: "Cần giữ mực nước 5-20cm." }
+                stages: {
+                    'seedling': 'Giai đoạn mạ (1-20 ngày)',
+                    'tillering': 'Đẻ nhánh (21-45 ngày)',
+                    'panicle': 'Trổ bông (46-75 ngày)',
+                    'flowering': 'Ra hoa (76-90 ngày)',
+                    'maturity': 'Chín (91-110 ngày)'
                 }
             },
             'om5451': {
                 name: "Lúa OM5451 (Ngọt)",
-                rules: {
-                    salinity: { max: 2.0, msg: "NGUY HIỂM! Giống này chịu mặn rất kém (<2‰)." },
-                    ph: { min: 6.0, max: 7.0, msg: "Đất chua phèn, cần bón vôi." },
-                    water: { min: 5, max: 15, msg: "Mực nước chưa phù hợp." }
+                stages: {
+                    'seedling': 'Giai đoạn mạ (1-20 ngày)',
+                    'tillering': 'Đẻ nhánh (21-40 ngày)',
+                    'panicle': 'Trổ bông (41-70 ngày)',
+                    'flowering': 'Ra hoa (71-85 ngày)',
+                    'maturity': 'Chín (86-105 ngày)'
                 }
             }
         }
@@ -26,199 +32,481 @@ const FARMING_DATA = {
         varieties: {
             'tom_su': {
                 name: "Tôm Sú (Quảng canh)",
-                rules: {
-                    salinity: { min: 10, max: 30, msg: "Độ mặn cần 10-30‰ để tôm lột vỏ tốt." },
-                    ph: { min: 7.5, max: 8.5, msg: "pH biến động, tôm dễ sốc." },
-                    water: { min: 80, max: 200, msg: "Nước cạn (<80cm), nhiệt độ nước sẽ tăng cao." }
+                stages: {
+                    'postlarval': 'Giai đoạn hậu ấu trùng (1-30 ngày)',
+                    'juvenile': 'Tôm con (31-60 ngày)',
+                    'subadult': 'Tôm giống (61-90 ngày)',
+                    'adult': 'Tôm trưởng thành (91-120 ngày)'
                 }
             },
             'tom_the': {
                 name: "Tôm Thẻ (Công nghiệp)",
-                rules: {
-                    salinity: { min: 15, max: 35, msg: "Độ mặn thấp, cần bổ sung khoáng." },
-                    ph: { min: 7.2, max: 8.3, msg: "pH cao, cảnh báo khí độc NH3." },
-                    water: { min: 100, max: 200, msg: "Mực nước cần sâu >1m." }
+                stages: {
+                    'postlarval': 'Giai đoạn hậu ấu trùng (1-25 ngày)',
+                    'juvenile': 'Tôm con (26-50 ngày)',
+                    'subadult': 'Tôm giống (51-75 ngày)',
+                    'adult': 'Tôm trưởng thành (76-100 ngày)'
                 }
             }
         }
     }
 };
 
+// === STATE MANAGEMENT ===
 let currentRules = null;
 let userStationId = "ST-01";
+let userName = "Người dùng";
+let userRole = "user";
+let currentGrowthStage = null;
+
+// Chart instances
 let salinityChartInstance = null;
 let tempChartInstance = null;
+let phChartInstance = null;
+let waterChartInstance = null;
+let weatherTempChartInstance = null;
+let rainChartInstance = null;
 let tideChartInstance = null;
-let currentRange = "24h";
 
-// ===== KHỞI CHẠY =====
+let currentRange = "24h";
+let currentParam = "all";
+
+// Update intervals
+let dataInterval = null;
+let timeInterval = null;
+
+// INITIALIZATION
+
 document.addEventListener("DOMContentLoaded", () => {
+    initializeDatetime();
     updateVarieties();
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN');
+    updateGrowthStages();
+
+    timeInterval = setInterval(updateDatetime, 1000);
 });
 
-// ===== LOGIN =====
-async function handleLogin() {
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
+function initializeDatetime() {
+    updateDatetime();
+}
+
+function updateDatetime() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('vi-VN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    const timeStr = now.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+
+    const dateElem = document.getElementById('current-date');
+    const timeElem = document.getElementById('current-time');
+
+    if (dateElem) dateElem.textContent = dateStr;
+    if (timeElem) timeElem.textContent = timeStr;
+}
+
+// AUTHENTICATION
+
+async function handleLogin(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const errorElement = document.getElementById('login-error');
+
+    if (!username || !password) {
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Vui lòng nhập đầy đủ thông tin';
+        return;
+    }
 
     try {
-        const res = await fetch('/api/login', {
+        const response = await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: user, password: pass })
+            body: JSON.stringify({ username, password })
         });
-        const data = await res.json();
+
+        const data = await response.json();
 
         if (data.status === 'ok') {
-            userStationId = data.station_id;
+            userName = data.msg;
+            userStationId = data.station_id || 'ST-01';
+            userRole = data.role || 'user';
+
+            // Hide login, show app
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('main-app').style.display = 'flex';
-            document.getElementById('display-name').innerText = data.msg;
-            initSystem();
+
+            // Update user info
+            document.getElementById('display-name').textContent = userName;
+            document.getElementById('station-id').textContent = `Trạm: ${userStationId}`;
+
+            // Show admin link if admin
+            if (userRole === 'admin') {
+                const adminLink = document.createElement('a');
+                adminLink.href = '/admin';
+                adminLink.target = '_blank';
+                adminLink.className = 'nav-link';
+                adminLink.innerHTML = '<i class="fas fa-cog"></i><span>Admin Panel</span>';
+                document.querySelector('nav').insertBefore(adminLink, document.querySelector('.logout'));
+            }
+
+            // Initialize system
+            initializeSystem();
         } else {
-            document.getElementById('login-error').style.display = 'block';
+            errorElement.style.display = 'block';
+            errorElement.textContent = data.msg || 'Sai thông tin đăng nhập';
         }
-    } catch (e) {
-        alert("Lỗi kết nối Server!");
+    } catch (error) {
+        console.error('Login error:', error);
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Lỗi kết nối đến máy chủ';
     }
 }
 
-function initSystem() {
-    fetchData();
-    fetchWeather();
-    fetchHistory('24h');
-    setInterval(fetchData, 2000);
+function handleLogout() {
+    if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        if (dataInterval) clearInterval(dataInterval);
+        if (timeInterval) clearInterval(timeInterval);
+        location.reload();
+    }
 }
 
-// ===== LOGIC CHỌN GIỐNG =====
+// SYSTEM INITIALIZATION
+
+function initializeSystem() {
+    fetchSensorData();
+    fetchWeatherData();
+    fetchHistory(currentRange, currentParam);
+    fetchWeatherAI();
+
+    // Auto-refresh every 3 seconds
+    dataInterval = setInterval(() => {
+        fetchSensorData();
+    }, 3000);
+
+    // Refresh weather every 10 minutes
+    setInterval(() => {
+        fetchWeatherData();
+    }, 600000);
+}
+
+// CROP SELECTION
+
 function updateVarieties() {
-    const type = document.getElementById('crop-type').value;
+    const cropType = document.getElementById('crop-type').value;
     const varietySelect = document.getElementById('crop-variety');
-    varietySelect.innerHTML = "";
 
-    const list = FARMING_DATA[type].varieties;
-    for (const key in list) {
-        let opt = document.createElement('option');
-        opt.value = key;
-        opt.innerText = list[key].name;
-        varietySelect.appendChild(opt);
+    varietySelect.innerHTML = '';
+
+    const varieties = FARMING_DATA[cropType].varieties;
+
+    for (const [key, variety] of Object.entries(varieties)) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = variety.name;
+        varietySelect.appendChild(option);
     }
+
+    updateGrowthStages();
     updateThresholds();
 }
 
+function updateGrowthStages() {
+    const cropType = document.getElementById('crop-type').value;
+    const varietyKey = document.getElementById('crop-variety').value;
+    const stageSelect = document.getElementById('growth-stage');
+
+    if (!stageSelect) return;
+
+    stageSelect.innerHTML = '<option value="">-- Chọn giai đoạn (tùy chọn) --</option>';
+
+    const variety = FARMING_DATA[cropType]?.varieties[varietyKey];
+    if (variety && variety.stages) {
+        for (const [key, label] of Object.entries(variety.stages)) {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = label;
+            stageSelect.appendChild(option);
+        }
+    }
+}
+
 function updateThresholds() {
-    const type = document.getElementById('crop-type').value;
-    const variety = document.getElementById('crop-variety').value;
-    currentRules = FARMING_DATA[type].varieties[variety];
-    document.getElementById('current-standard').innerText = currentRules.name;
-    fetchData();
+    const cropType = document.getElementById('crop-type').value;
+    const varietyKey = document.getElementById('crop-variety').value;
+
+    currentRules = FARMING_DATA[cropType].varieties[varietyKey];
+
+    const standardElem = document.getElementById('current-standard');
+    if (standardElem) {
+        standardElem.textContent = currentRules.name;
+    }
+
+    fetchSensorData();
 }
 
-// ===== LẤY DỮ LIỆU & PHÂN TÍCH =====
-async function fetchData() {
+// SENSOR DATA FETCHING
+
+async function fetchSensorData() {
     try {
-        const res = await fetch(`/api/sensor?device_id=${userStationId}`);
-        const data = await res.json();
+        const response = await fetch(`/api/sensor?device_id=${userStationId}`);
+        const data = await response.json();
 
-        // Update giá trị hiển thị
-        document.getElementById('val-sal').innerText = data.salinity.toFixed(1);
-        document.getElementById('val-temp').innerText = data.temperature + "°C";
-        document.getElementById('val-ph').innerText = data.ph;
-        document.getElementById('val-water').innerText = data.water_level + " cm";
+        updateSensorDisplay(data);
+        updateGauge(data.salinity);
 
-        // Update Gauge needle
-        let deg = (data.salinity / 20) * 180 - 90;
-        document.getElementById('gauge-needle').style.transform = `rotate(${deg}deg)`;
+        // Get analysis from backend
+        const cropType = document.getElementById('crop-type').value;
+        const varietyKey = document.getElementById('crop-variety').value;
+        const stageSelect = document.getElementById('growth-stage');
+        const stage = stageSelect ? stageSelect.value : null;
 
-        // Phân tích môi trường
-        analyzeEnvironment(data.salinity, data.ph, data.water_level);
+        const analysisUrl = `/api/analyze?device_id=${userStationId}&crop_type=${cropType}&variety=${varietyKey}${stage ? '&growth_stage=' + stage : ''}`;
+        const analysisResponse = await fetch(analysisUrl);
+        const analysis = await analysisResponse.json();
 
-    } catch (e) {
-        console.error("Lỗi fetch data:", e);
+        updateAnalysisDisplay(analysis);
+
+    } catch (error) {
+        console.error('Fetch sensor data error:', error);
     }
 }
 
-function analyzeEnvironment(sal, ph, water) {
-    if (!currentRules) return;
+function updateSensorDisplay(data) {
+    const valSal = document.getElementById('val-sal');
+    const valTemp = document.getElementById('val-temp');
+    const valPh = document.getElementById('val-ph');
+    const valWater = document.getElementById('val-water');
 
-    const r = currentRules.rules;
-    let adviceHtml = "";
-    let statusText = "MÔI TRƯỜNG TỐT";
-    let badgeClass = "st-bg-green";
-    let icon = "fa-check-circle";
+    if (valSal) valSal.textContent = data.salinity.toFixed(1);
+    if (valTemp) valTemp.textContent = data.temperature.toFixed(1) + '°C';
+    if (valPh) valPh.textContent = data.ph.toFixed(1);
+    if (valWater) valWater.textContent = data.water_level.toFixed(0) + ' cm';
+}
 
-    // 1. Phân tích độ mặn
-    if (r.salinity.max && sal > r.salinity.max) {
-        statusText = "NGUY HIỂM";
-        badgeClass = "st-bg-red";
-        icon = "fa-exclamation-triangle";
-        adviceHtml += `<li><i class="fas fa-tint" style="color:#ef4444"></i> <b>Độ mặn:</b> ${r.salinity.msg}</li>`;
-    } else if (r.salinity.min && sal < r.salinity.min) {
-        if (statusText !== "NGUY HIỂM") {
-            statusText = "CẢNH BÁO";
-            badgeClass = "st-bg-yellow";
-            icon = "fa-exclamation-circle";
-        }
-        adviceHtml += `<li><i class="fas fa-tint" style="color:#f59e0b"></i> <b>Độ mặn:</b> ${r.salinity.msg}</li>`;
+function updateGauge(salinity) {
+    const maxSalinity = 20;
+    const angle = ((salinity / maxSalinity) * 180) - 90;
+    const clampedAngle = Math.max(-90, Math.min(90, angle));
+
+    const needle = document.getElementById('gauge-needle');
+    if (needle) {
+        needle.style.transform = `rotate(${clampedAngle}deg)`;
     }
+}
 
-    // 2. Phân tích pH
-    if (ph < r.ph.min || ph > r.ph.max) {
-        if (statusText !== "NGUY HIỂM") {
-            statusText = "CẢNH BÁO";
-            badgeClass = "st-bg-yellow";
-            icon = "fa-exclamation-circle";
-        }
-        adviceHtml += `<li><i class="fas fa-flask" style="color:#f59e0b"></i> <b>Độ pH:</b> ${r.ph.msg}</li>`;
-    }
+// ANALYSIS DISPLAY
 
-    // 3. Phân tích mực nước
-    if (water < r.water.min) {
-        statusText = "NGUY HIỂM";
-        badgeClass = "st-bg-red";
-        icon = "fa-exclamation-triangle";
-        adviceHtml += `<li><i class="fas fa-arrow-down" style="color:#ef4444"></i> <b>Mực nước:</b> ${r.water.msg}</li>`;
-    }
+function updateAnalysisDisplay(analysis) {
+    updateStatusBadge(analysis.level, analysis.status);
+    updateAdviceList(analysis.advice, analysis.predictions);
+    updateDetailedAnalysis(analysis.detailed_analysis);
+}
 
-    // Nếu không có vấn đề
-    if (adviceHtml === "") {
-        adviceHtml = `<li><i class="fas fa-check-circle" style="color:#10b981"></i> Các chỉ số đều nằm trong ngưỡng an toàn. Môi trường phù hợp cho sự phát triển.</li>`;
-    }
-
-    // Cập nhật giao diện
+function updateStatusBadge(level, status) {
     const badge = document.getElementById('status-badge');
-    badge.className = `status-badge-lg ${badgeClass}`;
-    badge.innerHTML = `<i class="fas ${icon}"></i> <span>${statusText}</span>`;
+    if (!badge) return;
 
-    document.getElementById('advice-list').innerHTML = adviceHtml;
+    badge.classList.remove('status-safe', 'status-warning', 'status-danger');
+
+    let className = 'status-safe';
+    if (level === 'warning') className = 'status-warning';
+    if (level === 'danger') className = 'status-danger';
+
+    badge.classList.add(className);
+    badge.innerHTML = `
+        <span class="status-indicator"></span>
+        <span>${status}</span>
+    `;
 }
 
-// ===== BIỂU ĐỒ =====
-function renderSalinityChart(data, range) {
-    const ctx = document.getElementById("salinityChart").getContext('2d');
+function updateAdviceList(advice, predictions) {
+    const listElement = document.getElementById('advice-list');
+    if (!listElement) return;
 
-    // Tạo gradient
-    let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.5)');
-    gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+    if (!advice || advice.length === 0) {
+        listElement.innerHTML = `
+            <li class="alert-item alert-info">
+                <i class="fas fa-check-circle"></i>
+                <div class="alert-content">
+                    <strong>Môi trường ổn định</strong>
+                    Tất cả các chỉ số đều nằm trong ngưỡng an toàn.
+                </div>
+            </li>
+        `;
+        return;
+    }
 
-    if (salinityChartInstance) salinityChartInstance.destroy();
+    let html = '';
 
-    salinityChartInstance = new Chart(ctx, {
-        type: "line",
+    // Add advice items
+    advice.forEach(item => {
+        let alertClass = 'alert-info';
+        let icon = 'fa-info-circle';
+
+        if (item.includes('🚨') || item.includes('NGUY HIỂM')) {
+            alertClass = 'alert-danger';
+            icon = 'fa-exclamation-triangle';
+        } else if (item.includes('⚠️') || item.includes('CẢNH BÁO')) {
+            alertClass = 'alert-warning';
+            icon = 'fa-exclamation-circle';
+        } else if (item.includes('✅')) {
+            alertClass = 'alert-info';
+            icon = 'fa-check-circle';
+        } else if (item.includes('💡') || item.includes('📊')) {
+            alertClass = 'alert-info';
+            icon = 'fa-lightbulb';
+        }
+
+        html += `
+            <li class="alert-item ${alertClass}">
+                <i class="fas ${icon}"></i>
+                <div class="alert-content">${item}</div>
+            </li>
+        `;
+    });
+
+    // Add predictions
+    if (predictions && predictions.length > 0) {
+        predictions.forEach(pred => {
+            html += `
+                <li class="alert-item alert-info" style="background: #eff6ff; border-left-color: #3b82f6;">
+                    <i class="fas fa-crystal-ball"></i>
+                    <div class="alert-content">${pred}</div>
+                </li>
+            `;
+        });
+    }
+
+    listElement.innerHTML = html;
+}
+
+function updateDetailedAnalysis(detailed) {
+    if (!detailed) return;
+
+    // Update score if available
+    if (detailed.overall_score !== undefined) {
+        const scoreElem = document.getElementById('overall-score');
+        if (scoreElem) {
+            scoreElem.textContent = detailed.overall_score;
+
+            // Update color based on score
+            const scoreContainer = scoreElem.parentElement;
+            if (scoreContainer) {
+                scoreContainer.className = 'score-display';
+                if (detailed.overall_score >= 80) {
+                    scoreContainer.classList.add('score-good');
+                } else if (detailed.overall_score >= 60) {
+                    scoreContainer.classList.add('score-warning');
+                } else {
+                    scoreContainer.classList.add('score-danger');
+                }
+            }
+        }
+    }
+}
+
+// CHART RENDERING
+
+function changeRange(range) {
+    currentRange = range;
+
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    fetchHistory(range, currentParam);
+}
+
+function changeParam(param) {
+    currentParam = param;
+
+    document.querySelectorAll('.param-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    fetchHistory(currentRange, param);
+}
+
+async function fetchHistory(range, param) {
+    try {
+        const response = await fetch(`/api/sensor-history?device_id=${userStationId}&range=${range}`);
+        const data = await response.json();
+
+        // Render các biểu đồ
+        if (param === 'all' || param === 'salinity') renderChart('salinityChart', data, 'salinity', 'Độ mặn (‰)', '#16a34a');
+        if (param === 'all' || param === 'water') renderChart('waterChart', data, 'water', 'Mực nước (cm)', '#3b82f6');
+
+        // === CẬP NHẬT THỐNG KÊ (FIX LỖI) ===
+        if (data.stats) {
+            updateStatBox('salinity', data.stats.salinity);
+            updateStatBox('temperature', data.stats.temperature);
+            updateStatBox('ph', data.stats.ph);
+            updateStatBox('water', data.stats.water);
+        }
+
+    } catch (error) { console.error(error); }
+}
+
+// Hàm phụ trợ cập nhật số liệu
+function updateStatBox(type, stats) {
+    if (!stats) return;
+    const avgEl = document.getElementById(`${type}-avg`);
+    const minEl = document.getElementById(`${type}-min`);
+    const maxEl = document.getElementById(`${type}-max`);
+
+    if (avgEl) avgEl.textContent = stats.avg;
+    if (minEl) minEl.textContent = stats.min;
+    if (maxEl) maxEl.textContent = stats.max;
+}
+
+function renderChart(canvasId, data, dataKey, label, color) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    // Gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, color + '33');
+    gradient.addColorStop(1, color + '00');
+
+    // Get existing chart instance
+    let chartInstance;
+    if (canvasId === 'salinityChart') chartInstance = salinityChartInstance;
+    else if (canvasId === 'tempChart') chartInstance = tempChartInstance;
+    else if (canvasId === 'phChart') chartInstance = phChartInstance;
+    else if (canvasId === 'waterChart') chartInstance = waterChartInstance;
+
+    // Destroy existing
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+
+    // Create new chart
+    const newChart = new Chart(ctx, {
+        type: 'line',
         data: {
             labels: data.labels,
             datasets: [{
-                label: "Độ mặn (‰)",
-                data: data.salinity,
-                borderColor: "#10b981",
+                label: label,
+                data: data[dataKey],
+                borderColor: color,
                 backgroundColor: gradient,
-                borderWidth: 3,
-                pointBackgroundColor: "#ffffff",
-                pointBorderColor: "#10b981",
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                borderWidth: 2,
+                pointRadius: 2,
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: color,
+                pointHoverRadius: 5,
                 fill: true,
                 tension: 0.4
             }]
@@ -227,82 +515,229 @@ function renderSalinityChart(data, range) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: { size: 12, weight: 600 }
+                    }
+                },
                 tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     padding: 12,
-                    titleFont: { size: 14, weight: 'bold' },
-                    bodyFont: { size: 13 }
+                    titleFont: { size: 13 },
+                    bodyFont: { size: 12 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: dataKey === 'water',
+                    grid: {
+                        color: '#e5e7eb',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: { size: 11 }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: { size: 10 },
+                        maxRotation: 45,
+                        minRotation: 0
+                    }
+                }
+            }
+        }
+    });
+
+    // Store instance
+    if (canvasId === 'salinityChart') salinityChartInstance = newChart;
+    else if (canvasId === 'tempChart') tempChartInstance = newChart;
+    else if (canvasId === 'phChart') phChartInstance = newChart;
+    else if (canvasId === 'waterChart') waterChartInstance = newChart;
+}
+
+function updateStatistics(stats) {
+    for (const [param, values] of Object.entries(stats)) {
+        const avgElem = document.getElementById(`${param}-avg`);
+        const minElem = document.getElementById(`${param}-min`);
+        const maxElem = document.getElementById(`${param}-max`);
+
+        if (avgElem) avgElem.textContent = values.avg;
+        if (minElem) minElem.textContent = values.min;
+        if (maxElem) maxElem.textContent = values.max;
+    }
+}
+
+// WEATHER DATA
+
+async function fetchWeatherData() {
+    try {
+        const response = await fetch(`/api/weather-schedule?device_id=${userStationId}`);
+        const data = await response.json();
+
+        if (data.status === 'ok') {
+            updateWeatherDisplay(data);
+            renderWeatherCharts(data);
+        }
+
+    } catch (error) {
+        console.error('Fetch weather error:', error);
+    }
+}
+
+function updateWeatherDisplay(data) {
+    const tempElem = document.getElementById('weather-temp');
+    const descElem = document.getElementById('weather-desc');
+    const tideLevelElem = document.getElementById('tide-level');
+    const tideAdviceElem = document.getElementById('tide-advice');
+
+    if (tempElem) tempElem.textContent = data.weather.temp + '°C';
+    if (descElem) descElem.textContent = data.weather.desc;
+    if (tideLevelElem) tideLevelElem.textContent = data.tide.level;
+    if (tideAdviceElem) tideAdviceElem.textContent = data.tide.advice;
+}
+
+function renderWeatherCharts(data) {
+    renderWeatherTempChart(data.weather);
+    renderRainChart(data.weather);
+    renderTideChart(data.tide, data.weather.chart_dates);
+}
+
+function renderWeatherTempChart(weather) {
+    const canvas = document.getElementById('weatherTempChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    if (weatherTempChartInstance) {
+        weatherTempChartInstance.destroy();
+    }
+
+    weatherTempChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: weather.chart_dates,
+            datasets: [
+                {
+                    label: 'Nhiệt độ tối đa (°C)',
+                    data: weather.chart_temps_max,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Nhiệt độ tối thiểu (°C)',
+                    data: weather.chart_temps_min,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    grid: { color: '#e5e7eb' }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: { size: 10 }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderRainChart(weather) {
+    const canvas = document.getElementById('rainChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    if (rainChartInstance) {
+        rainChartInstance.destroy();
+    }
+
+    rainChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: weather.chart_dates,
+            datasets: [{
+                label: 'Lượng mưa (mm)',
+                data: weather.chart_rain,
+                backgroundColor: '#3b82f6',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: { color: '#e5e7eb', borderDash: [5, 5] },
-                    ticks: { font: { size: 12, weight: '600' } }
+                    grid: { color: '#e5e7eb' }
                 },
                 x: {
-                    grid: { display: false },
-                    ticks: { font: { size: 11 } }
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: { size: 10 }
+                    }
                 }
             }
         }
     });
 }
 
-function renderTempChart(dates, temps) {
-    const ctx = document.getElementById("tempChart").getContext('2d');
+function renderTideChart(tide, dates) {
+    const canvas = document.getElementById('tideChart');
+    if (!canvas) return;
 
-    if (tempChartInstance) tempChartInstance.destroy();
+    const ctx = canvas.getContext('2d');
 
-    tempChartInstance = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: dates,
-            datasets: [{
-                label: "Nhiệt độ tối đa (°C)",
-                data: temps,
-                borderColor: "#ef4444",
-                backgroundColor: "rgba(239, 68, 68, 0.1)",
-                borderWidth: 3,
-                pointBackgroundColor: "#ffffff",
-                pointBorderColor: "#ef4444",
-                pointRadius: 3,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: true, position: 'top' }
-            },
-            scales: {
-                y: { beginAtZero: false },
-                x: { ticks: { maxRotation: 45, minRotation: 45 } }
-            }
-        }
-    });
-}
-
-function renderTideChart(dates, levels) {
-    const ctx = document.getElementById("tideChart").getContext('2d');
-
-    if (tideChartInstance) tideChartInstance.destroy();
+    if (tideChartInstance) {
+        tideChartInstance.destroy();
+    }
 
     tideChartInstance = new Chart(ctx, {
-        type: "line",
+        type: 'line',
         data: {
             labels: dates,
             datasets: [{
-                label: "Mực nước triều (m)",
-                data: levels,
-                borderColor: "#3b82f6",
-                backgroundColor: "rgba(59, 130, 246, 0.1)",
-                borderWidth: 3,
-                pointBackgroundColor: "#ffffff",
-                pointBorderColor: "#3b82f6",
+                label: 'Mực nước triều (m)',
+                data: tide.chart_data,
+                borderColor: '#06b6d4',
+                backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                borderWidth: 2,
                 pointRadius: 3,
                 fill: true,
                 tension: 0.4
@@ -312,114 +747,138 @@ function renderTideChart(dates, levels) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: true, position: 'top' }
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
             },
             scales: {
-                y: { beginAtZero: true },
-                x: { ticks: { maxRotation: 45, minRotation: 45 } }
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#e5e7eb' }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: { size: 10 }
+                    }
+                }
             }
         }
     });
 }
 
-// ===== LỊCH SỬ DỮ LIỆU =====
-function changeRange(range) {
-    currentRange = range;
-    document.querySelectorAll(".chart-opts button").forEach(btn => btn.classList.remove("active"));
-    event.target.classList.add("active");
-    fetchHistory(range);
-}
+// AI DIAGNOSIS
 
-async function fetchHistory(range) {
-    try {
-        const res = await fetch(`/api/sensor-history?device_id=${userStationId}&range=${range}`);
-        const data = await res.json();
-        renderSalinityChart(data, range);
-    } catch (e) {
-        console.error("Lỗi fetch history:", e);
-    }
-}
-
-// ===== THỜI TIẾT =====
-async function fetchWeather() {
-    try {
-        const res = await fetch(`/api/weather-schedule?device_id=${userStationId}`);
-        const data = await res.json();
-
-        if (data.status === 'ok') {
-            // Cập nhật thông tin hiện tại
-            document.getElementById('weather-temp').innerText = data.weather.temp + "°C";
-            document.getElementById('weather-desc').innerText = data.weather.desc;
-            document.getElementById('tide-level').innerText = data.tide.level;
-            document.getElementById('tide-advice').innerText = data.tide.advice;
-
-            // Render biểu đồ nhiệt độ (37 ngày)
-            if (data.weather.chart_dates && data.weather.chart_temps) {
-                renderTempChart(data.weather.chart_dates, data.weather.chart_temps);
-            }
-
-            // Render biểu đồ thủy triều (37 ngày)
-            if (data.tide.chart_data && data.weather.chart_dates) {
-                renderTideChart(data.weather.chart_dates, data.tide.chart_data);
-            }
-        }
-    } catch (e) {
-        console.error("Lỗi fetch weather:", e);
-    }
-}
-
-// ===== BÁC SĨ AI =====
 async function uploadImage() {
-    const file = document.getElementById('camera-input').files[0];
+    const fileInput = document.getElementById('camera-input');
+    const file = fileInput.files[0];
+
     if (!file) return;
 
-    // Hiển thị preview
-    document.getElementById('ai-result').style.display = 'block';
-    document.getElementById('preview-img').src = URL.createObjectURL(file);
-    document.getElementById('ai-status').innerText = "Đang kết nối bác sĩ AI...";
-    document.getElementById('ai-solution').innerText = "Vui lòng chờ...";
+    const resultSection = document.getElementById('ai-result');
+    resultSection.style.display = 'block';
+
+    const preview = document.getElementById('preview-img');
+    preview.src = URL.createObjectURL(file);
+
+    document.getElementById('ai-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang phân tích...';
+    document.getElementById('ai-solution').innerHTML = 'Vui lòng chờ trong giây lát...';
 
     const formData = new FormData();
     formData.append('file', file);
 
-    // Gửi thêm context giống loài
-    const varietyName = currentRules ? currentRules.name : "Nông sản";
-    formData.append('context', varietyName);
-
     try {
-        const res = await fetch('/api/analyze-image', {
+        const response = await fetch('/api/analyze-image', {
             method: 'POST',
             body: formData
         });
-        const result = await res.json();
 
-        document.getElementById('ai-status').innerText = result.msg || "Đã phân tích xong";
-        document.getElementById('ai-solution').innerText = result.solution || "Không có khuyến nghị";
-    } catch (e) {
-        document.getElementById('ai-status').innerText = "Lỗi kết nối AI!";
-        document.getElementById('ai-solution').innerText = "Vui lòng thử lại sau.";
+        const result = await response.json();
+
+        // Update UI
+        let statusHTML = result.msg || 'Đã hoàn tất phân tích';
+        if (result.status === 'healthy') {
+            statusHTML = '✅ ' + statusHTML;
+        } else if (result.status === 'diseased') {
+            statusHTML = '🔴 ' + statusHTML;
+        } else if (result.status === 'pest') {
+            statusHTML = '🐛 ' + statusHTML;
+        }
+
+        document.getElementById('ai-status').innerHTML = statusHTML;
+        document.getElementById('ai-solution').textContent = result.solution || 'Không có khuyến nghị cụ thể.';
+
+    } catch (error) {
+        console.error('AI analysis error:', error);
+        document.getElementById('ai-status').innerHTML = '❌ Lỗi kết nối';
+        document.getElementById('ai-solution').textContent = 'Không thể kết nối đến dịch vụ AI. Vui lòng thử lại sau.';
     }
 }
 
-// ===== ĐIỀU HƯỚNG =====
-function switchPage(page) {
-    // Ẩn tất cả các trang
-    document.querySelectorAll('.page-section').forEach(e => e.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
+// NAVIGATION
 
-    // Cập nhật sidebar
-    document.querySelectorAll('.nav-link').forEach(e => e.classList.remove('active'));
-    const navLink = document.getElementById('nav-' + page);
-    if (navLink) navLink.classList.add('active');
+function switchPage(pageName) {
+    document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+    });
 
-    // Cập nhật mobile nav
-    document.querySelectorAll('.mobile-item').forEach(e => e.classList.remove('active'));
-    const mobItem = document.getElementById('mob-' + page);
-    if (mobItem) mobItem.classList.add('active');
+    const targetPage = document.getElementById('page-' + pageName);
+    if (targetPage) {
+        targetPage.classList.add('active');
+    }
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+
+    const targetNav = document.getElementById('nav-' + pageName);
+    if (targetNav) {
+        targetNav.classList.add('active');
+    }
+
+    document.querySelectorAll('.mobile-nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+
+    const targetMob = document.getElementById('mob-' + pageName);
+    if (targetMob) {
+        targetMob.classList.add('active');
+    }
+
+    // Load data when switching to certain pages
+    if (pageName === 'weather') {
+        fetchWeatherData();
+    }
 }
 
-function handleLogout() {
-    if (confirm("Bạn có chắc muốn đăng xuất?")) {
-        location.reload();
+// UTILITY FUNCTIONS
+
+function showNotification(message, type = 'info') {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    // Can be enhanced with toast library
+}
+
+// MOBILE MENU TOGGLE (if needed)
+
+function toggleMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('open');
+    }
+}
+async function fetchWeatherAI() {
+    try {
+        const response = await fetch(`/api/weather-prediction?device_id=${userStationId}`);
+        const data = await response.json();
+
+        const aiBox = document.getElementById('ai-weather-prediction');
+        if (aiBox) {
+            // Xóa icon quay tròn và hiện chữ
+            aiBox.innerHTML = `<i class="fas fa-magic" style="color:var(--info); margin-right:8px"></i> ${data.prediction}`;
+        }
+    } catch (error) {
+        console.error('AI Weather error:', error);
     }
 }
