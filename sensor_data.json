@@ -2,12 +2,12 @@
     "stations": {
         "ST-01": {
             "current": {
-                "salinity": 3.8,
-                "temperature": 32.0,
-                "ph": 7.0,
-                "water_level": 100.0,
-                "is_danger": false,
-                "alert": "\u1ed4n \u0111\u1ecbnh"
+                "salinity": 12.5,
+                "temperature": 36.5,
+                "ph": 4.5,
+                "water_level": 40.0,
+                "is_danger": true,
+                "alert": "C\u1ea3nh b\u00e1o c\u1ea1n n\u01b0\u1edbc"
             },
             "history": [
                 {
@@ -254,6 +254,71 @@
                     "time": "2026-01-15 12:31",
                     "salinity": 3.8,
                     "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 14:03",
+                    "salinity": 1.5,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 14:03",
+                    "salinity": 12.5,
+                    "temperature": 36.5
+                },
+                {
+                    "time": "2026-01-15 14:09",
+                    "salinity": 1.5,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 15:19",
+                    "salinity": 12.5,
+                    "temperature": 36.5
+                },
+                {
+                    "time": "2026-01-15 15:31",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 15:37",
+                    "salinity": 12.5,
+                    "temperature": 36.5
+                },
+                {
+                    "time": "2026-01-15 15:37",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 15:38",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 15:38",
+                    "salinity": 1.5,
+                    "temperature": 29.5
+                },
+                {
+                    "time": "2026-01-15 15:38",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 17:13",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 17:15",
+                    "salinity": 3.8,
+                    "temperature": 32.0
+                },
+                {
+                    "time": "2026-01-15 17:15",
+                    "salinity": 12.5,
+                    "temperature": 36.5
                 }
             ]
         },

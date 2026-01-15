@@ -17,7 +17,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 # === AI CONFIG ===
-GOOGLE_API_KEY = "AIzaSyAMlaUxEsQV1ilSwKMEgtQWqXWk877dZTE" 
+GOOGLE_API_KEY = "AIzaSyCJxu0fC4DHbDUSibE0ziVLzwbKSAhqW4Q" 
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
     model = genai.GenerativeModel('gemini-flash-latest')
