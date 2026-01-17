@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 # === AI CONFIG ===
 # Thay thế bằng API Key của bạn nếu cần
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyBcFLMarebH0D6mm6fyP3RKdriyFkIP3vc")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyB-u6StR2DNaP0waA5D9UvV8Y9DzB9vYYI")
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
     # Sửa tên model thành phiên bản ổn định hơn
@@ -37,66 +37,164 @@ STATION_CONFIG = {
     "ST-01": {"crop": "rice", "variety": "st25"},      # Sóc Trăng: Lúa
     "ST-02": {"crop": "shrimp", "variety": "tom_su"},  # Bạc Liêu: Tôm Sú
     "ST-03": {"crop": "rice", "variety": "om5451"},    # Kiên Giang: Lúa
-    "ST-04": {"crop": "shrimp", "variety": "tom_the"}  # Cà Mau: Tôm Thẻ
+    "ST-04": {"crop": "shrimp", "variety": "tom_the"},  # Cà Mau: Tôm Thẻ
+    "ST-05": {"crop": "shrimp", "variety": "tom_cang_xanh"}
 }
 
 # === ENHANCED FARMING RULES ===
 FARMING_RULES = {
+
     'rice': {
         'st25': {
-            'name': 'Lúa ST24/ST25 (Chịu mặn)',
+            'name': 'Lúa ST24/ST25',
             'salinity': {'min': 0, 'max': 4.0, 'optimal': [1.0, 2.5]},
             'ph': {'min': 5.5, 'max': 7.5, 'optimal': [6.0, 7.0]},
             'temperature': {'min': 25, 'max': 35, 'optimal': [28, 32]},
             'water': {'min': 5, 'max': 20, 'optimal': [8, 15]},
             'growth_stages': {
-                'seedling': {'days': '1-20', 'water': [3, 5], 'salinity_max': 2.0},
-                'tillering': {'days': '21-45', 'water': [5, 10], 'salinity_max': 3.0},
-                'panicle': {'days': '46-75', 'water': [10, 15], 'salinity_max': 2.5},
-                'flowering': {'days': '76-90', 'water': [8, 12], 'salinity_max': 2.0},
-                'maturity': {'days': '91-110', 'water': [3, 8], 'salinity_max': 3.5}
-            }
-        },
-        'om5451': {
-            'name': 'Lúa OM5451 (Ngọt)',
-            'salinity': {'min': 0, 'max': 2.0, 'optimal': [0, 1.0]},
-            'ph': {'min': 6.0, 'max': 7.0, 'optimal': [6.2, 6.8]},
-            'temperature': {'min': 24, 'max': 34, 'optimal': [27, 31]},
-            'water': {'min': 5, 'max': 15, 'optimal': [7, 12]},
-            'growth_stages': {
-                'seedling': {'days': '1-20', 'water': [5, 8], 'salinity_max': 1.0},
-                'tillering': {'days': '21-40', 'water': [8, 12], 'salinity_max': 1.5},
-                'panicle': {'days': '41-70', 'water': [10, 15], 'salinity_max': 1.0},
-                'flowering': {'days': '71-85', 'water': [8, 12], 'salinity_max': 0.5},
-                'maturity': {'days': '86-105', 'water': [5, 10], 'salinity_max': 2.0}
+                'seedling': {
+                    'days': '1-20',
+                    'salinity_max': 2.0,
+                    'ph_range': [5.5, 7.0],
+                    'temp_range': [26, 32],
+                    'water': [3, 5],
+                    'sensitive': True,
+                    'risk_note': 'Giai đoạn mạ rất nhạy mặn',
+                    'action': 'Không lấy nước khi mặn > 2‰'
+                },
+                'panicle': {
+                    'days': '46-75',
+                    'salinity_max': 2.5,
+                    'ph_range': [6.0, 7.0],
+                    'temp_range': [28, 32],
+                    'water': [10, 15],
+                    'sensitive': True,
+                    'risk_note': 'Làm đòng gặp mặn gây lép',
+                    'action': 'Giữ nước ngọt tuyệt đối'
+                },
+                'maturity': {
+                    'days': '91-110',
+                    'salinity_max': 3.5,
+                    'ph_range': [6.0, 7.5],
+                    'temp_range': [25, 35],
+                    'water': [3, 8],
+                    'sensitive': False,
+                    'risk_note': 'Chịu mặn tốt hơn',
+                    'action': 'Chuẩn bị thu hoạch'
+                }
             }
         }
     },
+
     'shrimp': {
+
         'tom_su': {
-            'name': 'Tôm Sú (Quảng canh)',
-            'salinity': {'min': 10, 'max': 30, 'optimal': [15, 25]},
-            'ph': {'min': 7.5, 'max': 8.5, 'optimal': [7.8, 8.2]},
-            'temperature': {'min': 26, 'max': 32, 'optimal': [28, 30]},
+            'name': 'Tôm Sú',
+            'salinity': {'min': 5, 'max': 35, 'optimal': [15, 25]},
+            'ph': {'min': 7.0, 'max': 9.0, 'optimal': [7.8, 8.5]},
+            'temperature': {'min': 18, 'max': 33, 'optimal': [28, 30]},
             'water': {'min': 80, 'max': 200, 'optimal': [100, 150]},
             'growth_stages': {
-                'postlarval': {'days': '1-30', 'water': [80, 100], 'salinity': [15, 20]},
-                'juvenile': {'days': '31-60', 'water': [100, 120], 'salinity': [18, 25]},
-                'subadult': {'days': '61-90', 'water': [120, 150], 'salinity': [20, 28]},
-                'adult': {'days': '91-120', 'water': [100, 150], 'salinity': [15, 30]}
+                'postlarval': {
+                    'days': '1-30',
+                    'salinity': [15, 20],
+                    'ph_range': [7.8, 8.5],
+                    'temp_range': [28, 30],
+                    'water': [80, 100],
+                    'oxygen_risk': 'high',
+                    'risk_note': 'Tôm con dễ sốc môi trường',
+                    'action': 'Ổn định nước, chạy quạt liên tục'
+                },
+                'juvenile': {
+                    'days': '31-60',
+                    'salinity': [18, 25],
+                    'ph_range': [7.5, 8.5],
+                    'temp_range': [27, 31],
+                    'water': [100, 120],
+                    'oxygen_risk': 'medium',
+                    'risk_note': 'Tôm tăng trưởng nhanh',
+                    'action': 'Theo dõi pH ngày đêm'
+                },
+                'adult': {
+                    'days': '61-120',
+                    'salinity': [15, 30],
+                    'ph_range': [7.5, 8.8],
+                    'temp_range': [26, 32],
+                    'water': [120, 150],
+                    'oxygen_risk': 'medium',
+                    'risk_note': 'Tôm chịu đựng tốt hơn',
+                    'action': 'Duy trì nước ổn định'
+                }
             }
         },
+
         'tom_the': {
-            'name': 'Tôm Thẻ (Công nghiệp)',
-            'salinity': {'min': 15, 'max': 35, 'optimal': [20, 30]},
-            'ph': {'min': 7.2, 'max': 8.3, 'optimal': [7.5, 8.0]},
-            'temperature': {'min': 25, 'max': 33, 'optimal': [27, 31]},
-            'water': {'min': 100, 'max': 200, 'optimal': [120, 180]},
+            'name': 'Tôm Chân Trắng',
+            'salinity': {'min': 5, 'max': 35, 'optimal': [20, 30]},
+            'ph': {'min': 7.0, 'max': 9.0, 'optimal': [7.5, 8.2]},
+            'temperature': {'min': 18, 'max': 33, 'optimal': [27, 31]},
+            'water': {'min': 80, 'max': 200, 'optimal': [120, 180]},
             'growth_stages': {
-                'postlarval': {'days': '1-25', 'water': [100, 120], 'salinity': [20, 25]},
-                'juvenile': {'days': '26-50', 'water': [120, 150], 'salinity': [22, 30]},
-                'subadult': {'days': '51-75', 'water': [150, 180], 'salinity': [25, 32]},
-                'adult': {'days': '76-100', 'water': [120, 180], 'salinity': [20, 35]}
+                'postlarval': {
+                    'days': '1-25',
+                    'salinity': [20, 25],
+                    'ph_range': [7.8, 8.2],
+                    'temp_range': [28, 30],
+                    'water': [100, 120],
+                    'oxygen_risk': 'very_high',
+                    'risk_note': 'Tôm chân trắng cực kỳ nhạy',
+                    'action': 'Chạy quạt mạnh, tránh thay nước đột ngột'
+                },
+                'juvenile': {
+                    'days': '26-50',
+                    'salinity': [22, 30],
+                    'ph_range': [7.5, 8.2],
+                    'temp_range': [27, 31],
+                    'water': [120, 150],
+                    'oxygen_risk': 'high',
+                    'risk_note': 'Dễ sốc pH – nhiệt',
+                    'action': 'Giữ pH ổn định, bổ sung khoáng'
+                },
+                'adult': {
+                    'days': '51-100',
+                    'salinity': [20, 35],
+                    'ph_range': [7.5, 8.5],
+                    'temp_range': [26, 32],
+                    'water': [150, 180],
+                    'oxygen_risk': 'medium',
+                    'risk_note': 'Ổn định hơn nhưng vẫn nhạy',
+                    'action': 'Theo dõi oxy ban đêm'
+                }
+            }
+        },
+
+        'tom_cang_xanh': {
+            'name': 'Tôm Càng Xanh',
+            'salinity': {'min': 0, 'max': 5, 'optimal': [0, 2]},
+            'ph': {'min': 7.0, 'max': 8.5, 'optimal': [7.5, 8.0]},
+            'temperature': {'min': 29, 'max': 31, 'optimal': [29.5, 30.5]},
+            'water': {'min': 60, 'max': 120, 'optimal': [70, 100]},
+            'growth_stages': {
+                'juvenile': {
+                    'days': '1-60',
+                    'salinity': [0, 2],
+                    'ph_range': [7.5, 8.0],
+                    'temp_range': [29, 31],
+                    'water': [60, 80],
+                    'oxygen_risk': 'medium',
+                    'risk_note': 'Thích nước tĩnh, sạch',
+                    'action': 'Tránh xáo trộn ao'
+                },
+                'adult': {
+                    'days': '61-150',
+                    'salinity': [0, 5],
+                    'ph_range': [7.0, 8.5],
+                    'temp_range': [28, 32],
+                    'water': [80, 120],
+                    'oxygen_risk': 'low',
+                    'risk_note': 'Chịu đựng tốt',
+                    'action': 'Giữ nước ổn định'
+                }
             }
         }
     }
@@ -115,7 +213,7 @@ def create_station_template():
 
 def load_data():
     default_data = {
-        "stations": { "ST-01": create_station_template(), "ST-02": create_station_template() }
+        "stations": { sid: create_station_template() for sid in STATION_CONFIG }
     }
     if os.path.exists(DB_FILE):
         try:
@@ -155,6 +253,10 @@ db = load_data()
 # === ENHANCED SMART ANALYSIS ===
 def analyze_environment_smart(salinity, ph, temperature, water_level, crop_type='rice', variety='st25', growth_stage=None):
     rules = FARMING_RULES.get(crop_type, {}).get(variety, {})
+    stage_rules = None
+    if growth_stage and "growth_stages" in rules:
+        stage_rules = rules["growth_stages"].get(growth_stage)
+    sal_rule = stage_rules.get("salinity", rules.get("salinity")) if stage_rules else rules.get("salinity")
     if not rules:
         return {
             "status": "UNKNOWN", "level": "info", "advice": ["Chưa có quy tắc"], "detailed_analysis": {}

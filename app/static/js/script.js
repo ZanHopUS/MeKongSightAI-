@@ -2,50 +2,72 @@
 
 // === CONFIGURATION ===
 const FARMING_DATA = {
-    'rice': {
+    rice: {
         name: "Vụ Lúa",
         varieties: {
-            'st25': {
+
+            st25: {
                 name: "Lúa ST24/ST25 (Chịu mặn)",
                 stages: {
-                    'seedling': 'Giai đoạn mạ (1-20 ngày)',
-                    'tillering': 'Đẻ nhánh (21-45 ngày)',
-                    'panicle': 'Trổ bông (46-75 ngày)',
-                    'flowering': 'Ra hoa (76-90 ngày)',
-                    'maturity': 'Chín (91-110 ngày)'
+                    seedling: "Giai đoạn mạ (1–20 ngày)",
+                    tillering: "Đẻ nhánh (21–45 ngày)",
+                    panicle: "Làm đòng (46–75 ngày)",
+                    flowering: "Ra hoa (76–90 ngày)",
+                    maturity: "Chín (91–110 ngày)"
                 }
             },
-            'om5451': {
+
+            om5451: {
                 name: "Lúa OM5451 (Ngọt)",
                 stages: {
-                    'seedling': 'Giai đoạn mạ (1-20 ngày)',
-                    'tillering': 'Đẻ nhánh (21-40 ngày)',
-                    'panicle': 'Trổ bông (41-70 ngày)',
-                    'flowering': 'Ra hoa (71-85 ngày)',
-                    'maturity': 'Chín (86-105 ngày)'
+                    seedling: "Giai đoạn mạ (1–20 ngày)",
+                    tillering: "Đẻ nhánh (21–40 ngày)",
+                    panicle: "Làm đòng (41–70 ngày)",
+                    flowering: "Ra hoa (71–85 ngày)",
+                    maturity: "Chín (86–105 ngày)"
+                }
+            },
+
+            om6976: {
+                name: "Lúa OM6976 (Ngọt)",
+                stages: {
+                    seedling: "Giai đoạn mạ",
+                    tillering: "Đẻ nhánh",
+                    panicle: "Làm đòng",
+                    flowering: "Ra hoa",
+                    maturity: "Chín"
                 }
             }
         }
     },
-    'shrimp': {
+
+    shrimp: {
         name: "Vụ Tôm",
         varieties: {
-            'tom_su': {
+
+            tom_su: {
                 name: "Tôm Sú (Quảng canh)",
                 stages: {
-                    'postlarval': 'Giai đoạn hậu ấu trùng (1-30 ngày)',
-                    'juvenile': 'Tôm con (31-60 ngày)',
-                    'subadult': 'Tôm giống (61-90 ngày)',
-                    'adult': 'Tôm trưởng thành (91-120 ngày)'
+                    postlarval: "Hậu ấu trùng (1–30 ngày)",
+                    juvenile: "Tôm con (31–60 ngày)",
+                    adult: "Tôm trưởng thành (61–120 ngày)"
                 }
             },
-            'tom_the': {
-                name: "Tôm Thẻ (Công nghiệp)",
+
+            tom_the: {
+                name: "Tôm Chân Trắng (Công nghiệp)",
                 stages: {
-                    'postlarval': 'Giai đoạn hậu ấu trùng (1-25 ngày)',
-                    'juvenile': 'Tôm con (26-50 ngày)',
-                    'subadult': 'Tôm giống (51-75 ngày)',
-                    'adult': 'Tôm trưởng thành (76-100 ngày)'
+                    postlarval: "Hậu ấu trùng (1–25 ngày)",
+                    juvenile: "Tôm con (26–50 ngày)",
+                    adult: "Tôm trưởng thành (51–100 ngày)"
+                }
+            },
+
+            tom_cang_xanh: {
+                name: "Tôm Càng Xanh",
+                stages: {
+                    juvenile: "Tôm non (1–60 ngày)",
+                    adult: "Tôm trưởng thành (61–150 ngày)"
                 }
             }
         }
@@ -177,7 +199,15 @@ function handleLogout() {
         location.reload();
     }
 }
-
+ function openRegister() {
+    alert(
+        "Chức năng đăng ký sẽ cho phép:\n" +
+        "- Tạo tài khoản người dân\n" +
+        "- Gán trạm quan trắc\n" +
+        "- Chọn mô hình Lúa – Tôm\n\n" +
+        "Hiện đang ở bản demo."
+    );
+}
 // SYSTEM INITIALIZATION
 
 function initializeSystem() {
