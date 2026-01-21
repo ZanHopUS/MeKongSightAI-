@@ -55,7 +55,7 @@ class NoCacheHTMLMiddleware(BaseHTTPMiddleware):
 app.add_middleware(NoCacheHTMLMiddleware)
 
 # ===== AI CONFIG =====
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyB-u6StR2DNaP0waA5D9UvV8Y9DzB9vYYI")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyD7ZY1dNNvLscSIAvdMepC5nLmkdUHgHOg")
 model = None
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
@@ -397,9 +397,9 @@ async def register_page(request: Request):
 
 @app.get("/admin")
 async def admin_page(request: Request):
-    admin_file = TEMPLATES_DIR / "admin.html"
+    admin_file = ROOT / "admin.html"
     if admin_file.exists():
-        return templates.TemplateResponse("admin.html", {"request": request})
+        return FileResponse(admin_file)
     return RedirectResponse(url="/login", status_code=302)
 
 @app.get("/hybridaction/zybTrackerStatisticsAction")

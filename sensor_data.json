@@ -2,13 +2,13 @@
     "stations": {
         "ST-01": {
             "current": {
-                "salinity": 24.6,
-                "temperature": 30.3,
+                "salinity": 6.9,
+                "temperature": 32.4,
                 "ph": 7.0,
                 "water_level": 100.0,
                 "is_danger": true,
                 "alert": "NGUY HIỂM",
-                "timestamp": "2026-01-17T21:34:55.907405"
+                "timestamp": "2026-01-21T15:10:54.314549"
             },
             "history": [
                 {
@@ -535,6 +535,20 @@
                     "temperature": 30.3,
                     "ph": 7.0,
                     "water_level": 100.4
+                },
+                {
+                    "time": "2026-01-21 15:10",
+                    "salinity": 2.2,
+                    "temperature": 32.4,
+                    "ph": 7.0,
+                    "water_level": 100.0
+                },
+                {
+                    "time": "2026-01-21 15:10",
+                    "salinity": 6.9,
+                    "temperature": 32.4,
+                    "ph": 7.0,
+                    "water_level": 100.0
                 }
             ]
         },
