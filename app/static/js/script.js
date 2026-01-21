@@ -199,14 +199,61 @@ function handleLogout() {
         location.reload();
     }
 }
- function openRegister() {
-    alert(
-        "Chức năng đăng ký sẽ cho phép:\n" +
-        "- Tạo tài khoản người dân\n" +
-        "- Gán trạm quan trắc\n" +
-        "- Chọn mô hình Lúa – Tôm\n\n" +
-        "Hiện đang ở bản demo."
-    );
+function openRegister() {
+    alert("Chức năng đăng ký sẽ cho phép:\n- Tạo tài khoản người dân\n- Gán trạm quan trắc\n- Chọn mô hình Lúa – Tôm\n\nHiện đang ở bản demo.");
+}
+async function handleRegistration(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('reg-username').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const fullName = document.getElementById('reg-fullname').value.trim();
+    const stationId = document.getElementById('reg-station').value.trim();
+    const errorElement = document.getElementById('register-error');
+    const successElement = document.getElementById('register-success');
+
+    if (!username || !password || !fullName || !stationId) {
+        errorElement.textContent = 'Vui lòng nhập đủ thông tin';
+        errorElement.style.display = 'block';
+        if(successElement) successElement.style.display = 'none';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username,
+                password,
+                full_name: fullName,
+                station_id: stationId
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'ok') {
+            if (successElement) {
+                successElement.textContent = 'Đăng ký thành công! Chuyển về trang đăng nhập...';
+                successElement.style.display = 'block';
+            }
+            errorElement.style.display = 'none';
+
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        } else {
+            errorElement.textContent = data.msg || 'Đăng ký không thành công';
+            errorElement.style.display = 'block';
+            if(successElement) successElement.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        errorElement.textContent = 'Lỗi kết nối';
+        errorElement.style.display = 'block';
+        if(successElement) successElement.style.display = 'none';
+    }
 }
 // SYSTEM INITIALIZATION
 
