@@ -1234,7 +1234,6 @@ nav {
 
 .ai-upload-zone:hover {
     background: #ecfdf5;
-    /* Màu xanh nhạt khi hover */
     border-color: var(--primary-dark);
     transform: translateY(-2px);
 }
@@ -1274,11 +1273,9 @@ nav {
     color: var(--gray-500);
 }
 
-/* Layout Kết quả: Chia 2 cột */
 .ai-result-grid {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
-    /* Ảnh nhỏ hơn, chữ rộng hơn */
     gap: 2rem;
     align-items: start;
     border-top: 1px solid var(--gray-200);
@@ -1296,7 +1293,6 @@ nav {
     letter-spacing: 0.05em;
 }
 
-/* Cột ảnh */
 .ai-preview-img {
     width: 100%;
     border-radius: 12px;
@@ -1306,10 +1302,8 @@ nav {
     max-height: 400px;
 }
 
-/* Cột nội dung chẩn đoán */
 .diagnosis-card {
     background: #f0fdf4;
-    /* Màu nền xanh nhẹ */
     border: 1px solid #bbf7d0;
     border-radius: 12px;
     padding: 1.5rem;
@@ -1339,10 +1333,8 @@ nav {
     line-height: 1.7;
     color: var(--gray-800);
     white-space: pre-line;
-    /* Để hiển thị xuống dòng nếu AI trả về */
 }
 
-/* Responsive cho Mobile: Chuyển về 1 cột dọc */
 @media (max-width: 768px) {
     .ai-result-grid {
         grid-template-columns: 1fr;
@@ -1361,7 +1353,6 @@ nav {
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
 }
 
-/* Cột giới thiệu */
 .login-intro {
     background: linear-gradient(135deg, #059669, #047857);
     color: white;
@@ -1400,7 +1391,6 @@ nav {
     color: #bbf7d0;
 }
 
-/* Footer login */
 .login-footer {
     margin-top: 1.5rem;
     text-align: center;
@@ -1414,7 +1404,6 @@ nav {
     text-decoration: none;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .login-box {
         grid-template-columns: 1fr;
@@ -1563,7 +1552,6 @@ nav {
     font-weight: 600;
 }
 
-/* Crop season info card */
 .crop-season-card {
     background: linear-gradient(135deg, #f0fdf4, #dcfce7);
     border: 2px solid var(--primary-light);
@@ -1628,7 +1616,6 @@ nav {
     color: var(--gray-900);
 }
 
-/* Progress circle */
 .progress-circle {
     position: relative;
     width: 140px;

@@ -80,7 +80,7 @@ const STAGE_ADVICE_MAP = {
     'panicle': "Bón đón đòng. Giữ mực nước ổn định, phòng bệnh đạo ôn.",
     'flowering': "Giữ nước đủ ẩm. Phòng ngừa lem lép hạt.",
     'maturity': "Rút nước cạn dần. Chuẩn bị thu hoạch.",
-    'post_larvae': "Kiểm tra pH/kiềm 2 lần/ngày. Gây màu nước.", 
+    'post_larvae': "Kiểm tra pH/kiềm 2 lần/ngày. Gây màu nước.",
     'grow_out': "Tăng cường quạt nước. Bổ sung khoáng, vitamin.",
     'harvest': "Xi phông đáy ao kỹ. Chuẩn bị lưới thu hoạch."
 };
@@ -94,7 +94,7 @@ function getCurrentStageFromData(cropType, variety, daysOld) {
     const stagesObj = cropConfig.varieties[variety].stages;
 
     for (const [stageKey, stageNameStr] of Object.entries(stagesObj)) {
-      
+
         const match = stageNameStr.match(/(\d+)[-–](\d+)/);
 
         if (match) {
@@ -103,7 +103,7 @@ function getCurrentStageFromData(cropType, variety, daysOld) {
 
             if (daysOld >= minDay && daysOld <= maxDay) {
                 return {
-                    name: stageNameStr, 
+                    name: stageNameStr,
                     advice: STAGE_ADVICE_MAP[stageKey] || "Theo dõi các chỉ số môi trường thường xuyên."
                 };
             }
@@ -235,7 +235,7 @@ async function handleLogin(event) {
                 document.querySelector('nav').insertBefore(adminLink, document.querySelector('.logout'));
             }
 
-            initializeSystem(username); 
+            initializeSystem(username);
             await loadUserCropData(username);
         } else {
             errorElement.style.display = 'block';
@@ -311,27 +311,6 @@ async function handleRegistration(event) {
         if (successElement) successElement.style.display = 'none';
     }
 }
-
-async function initializeSystem(username) {
-    console.log(' Initializing system for:', username);
-
-    
-    await loadUserCropData(username);
-
-    fetchSensorData();
-    fetchWeatherData();
-    fetchHistory(currentRange, currentParam);
-    fetchWeatherAI();
-
-    dataInterval = setInterval(() => {
-        fetchSensorData();
-    }, 3000);
-
-    setInterval(() => {
-        fetchWeatherData();
-    }, 600000);
-}
-
 
 function updateVarieties() {
     const cropType = document.getElementById('crop-type').value;
@@ -913,15 +892,15 @@ async function uploadImage() {
 
         const result = await response.json();
 
-        console.log(' AI Result:', result); 
-        
+        console.log(' AI Result:', result);
+
         if (result.status === 'error') {
             document.getElementById('ai-status').innerHTML = '❌ Lỗi: ' + result.msg;
             document.getElementById('ai-solution').textContent = result.solution || 'Vui lòng thử lại sau.';
             return;
         }
 
-        
+
         let statusHTML = result.msg || 'Đã hoàn tất phân tích';
         if (result.status === 'healthy') {
             statusHTML = '✅ ' + statusHTML;
@@ -994,7 +973,7 @@ async function fetchWeatherAI() {
 
         const aiBox = document.getElementById('ai-weather-prediction');
         if (aiBox) {
-           
+
             aiBox.innerHTML = `<i class="fas fa-magic" style="color:var(--info); margin-right:8px"></i> ${data.prediction}`;
         }
     } catch (error) {
@@ -1192,14 +1171,14 @@ async function confirmSeasonSwitch() {
     const variety = document.getElementById('modal-variety').value;
 
     const today = new Date().toISOString().split('T')[0];
-    const username = localStorage.getItem('mekong_username'); 
+    const username = localStorage.getItem('mekong_username');
 
     if (!username) {
         alert("Vui lòng đăng nhập lại!");
         return;
     }
 
-    const btn = event.target; 
+    const btn = event.target;
     const originalText = btn.innerText;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
     btn.disabled = true;
@@ -1209,10 +1188,10 @@ async function confirmSeasonSwitch() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                username: username,      
+                username: username,
                 crop_type: cropType,
                 variety: variety,
-                start_date: today       
+                start_date: today
             })
         });
 
@@ -1222,17 +1201,17 @@ async function confirmSeasonSwitch() {
             alert('✅ ' + result.msg);
 
             document.getElementById('crop-type').value = cropType;
-            updateVarieties(); 
+            updateVarieties();
             setTimeout(() => {
                 document.getElementById('crop-variety').value = variety;
-                updateThresholds(); 
+                updateThresholds();
             }, 100);
 
-       
+
             const modal = document.querySelector('.modal-overlay');
             if (modal) modal.remove();
 
-         
+
             loadUserCropData(username);
         } else {
             alert('❌ Lỗi: ' + result.msg);
@@ -1254,7 +1233,7 @@ function initializeSystem() {
     fetchWeatherData();
     fetchHistory(currentRange, currentParam);
     fetchWeatherAI();
-    fetchSeasonInfo(); 
+    fetchSeasonInfo();
 
     dataInterval = setInterval(() => {
         fetchSensorData();
@@ -1262,7 +1241,7 @@ function initializeSystem() {
 
     setInterval(() => {
         fetchWeatherData();
-        fetchSeasonInfo(); 
+        fetchSeasonInfo();
     }, 600000);
 }
 

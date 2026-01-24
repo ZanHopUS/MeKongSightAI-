@@ -8,11 +8,11 @@
         "crop_data": {
             "crop_type": "rice",
             "variety": "st25",
-            "planting_date": "2025-12-29",
+            "planting_date": "2026-01-05",
             "cycle_length": 110,
-            "current_stage": "tillering",
-            "days_since_planting": 27,
-            "last_updated": "2026-01-25T03:23:59.706767"
+            "current_stage": "seedling",
+            "days_since_planting": 20,
+            "last_updated": "2026-01-25T04:34:17.709545"
         }
     },
     {
