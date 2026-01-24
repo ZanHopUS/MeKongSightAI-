@@ -132,22 +132,23 @@ body {
 }
 
 .btn-primary {
-    width: 100%;
-    padding: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     font-weight: 700;
-    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s;
-    margin-top: 1rem;
+    text-decoration: none;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px -5px rgba(5, 150, 105, 0.4);
+    box-shadow: 0 8px 16px rgba(5, 150, 105, 0.4);
 }
 
 .login-error {
@@ -1348,6 +1349,7 @@ nav {
         gap: 1.5rem;
     }
 }
+
 .login-box {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
@@ -1356,7 +1358,7 @@ nav {
     overflow: hidden;
     width: 900px;
     max-width: 95%;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
 }
 
 /* Cột giới thiệu */
@@ -1421,4 +1423,234 @@ nav {
     .login-intro {
         text-align: center;
     }
+}
+
+.season-current {
+    animation: fadeIn 0.5s ease;
+}
+
+.modal-overlay {
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.season-actions .alert-item {
+    cursor: default;
+}
+
+.season-actions .alert-item:hover {
+    transform: translateX(4px);
+    background: var(--primary-bg);
+}
+
+#season-info-container {
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-size: 0.9375rem;
+}
+
+.btn-back:hover {
+    background: var(--gray-200);
+    border-color: var(--gray-300);
+    transform: translateX(-2px);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.form-group select,
+.form-group input[type="date"] {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background: var(--gray-50);
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
+}
+
+.stage-info {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 2px solid var(--primary-light);
+}
+
+.progress-bar {
+    background: rgba(0, 0, 0, 0.1);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.success-message {
+    background: #f0fdf4;
+    border: 2px solid var(--success);
+    color: var(--success);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+}
+
+/* Crop season info card */
+.crop-season-card {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 2px solid var(--primary-light);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.crop-season-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(5, 150, 105, 0.2);
+}
+
+.crop-season-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.crop-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.crop-detail-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    font-size: 1.25rem;
+}
+
+.crop-detail-content {
+    flex: 1;
+}
+
+.crop-detail-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.crop-detail-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+/* Progress circle */
+.progress-circle {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.progress-circle-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.progress-circle-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.progress-circle-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    font-weight: 600;
 }

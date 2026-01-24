@@ -17,7 +17,8 @@ import google.generativeai as genai
 from PIL import Image
 import io
 from pathlib import Path
-
+from dotenv import load_dotenv
+from fastapi import Body
 # ✅ Added from Flask version: bcrypt hashing/checking
 # pip install bcrypt
 import bcrypt
@@ -55,7 +56,7 @@ class NoCacheHTMLMiddleware(BaseHTTPMiddleware):
 app.add_middleware(NoCacheHTMLMiddleware)
 
 # ===== AI CONFIG =====
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyD7ZY1dNNvLscSIAvdMepC5nLmkdUHgHOg")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyAlOL_dfrRfG8Cyl87ZuJHYLnB08x1z2lM")
 model = None
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
@@ -232,6 +233,167 @@ FARMING_RULES = {
     },
 }
 
+# Thêm vào sau phần FARMING_RULES
+
+# ===== CROP ROTATION CALENDAR =====
+CROP_ROTATION = {
+    "dong_bang_song_cuu_long": {
+        "regions": {
+            "soc_trang_bac_lieu": {
+                "name": "Sóc Trăng - Bạc Liêu",
+                "cycles": [
+                    {
+                        "id": "winter_spring_rice",
+                        "name": "Lúa Đông Xuân",
+                        "start_month": 11,  # Tháng 11
+                        "end_month": 3,     # Tháng 3
+                        "crop_type": "rice",
+                        "varieties": ["st25", "om5451"],
+                        "salinity_risk": "low",
+                        "note": "Mùa nước ngọt, thuận lợi trồng lúa"
+                    },
+                    {
+                        "id": "summer_autumn_rice",
+                        "name": "Lúa Hè Thu",
+                        "start_month": 4,
+                        "end_month": 7,
+                        "crop_type": "rice",
+                        "varieties": ["st25", "om5451"],
+                        "salinity_risk": "medium",
+                        "note": "Cần theo dõi mặn, có thể chuyển tôm"
+                    },
+                    {
+                        "id": "shrimp_season",
+                        "name": "Vụ Tôm",
+                        "start_month": 8,
+                        "end_month": 10,
+                        "crop_type": "shrimp",
+                        "varieties": ["tom_su", "tom_the"],
+                        "salinity_risk": "high",
+                        "note": "Mùa xâm nhập mặn, thích hợp nuôi tôm"
+                    }
+                ]
+            },
+            "ca_mau_kien_giang": {
+                "name": "Cà Mau - Kiên Giang",
+                "cycles": [
+                    {
+                        "id": "rice_fresh_water",
+                        "name": "Lúa (nước ngọt)",
+                        "start_month": 12,
+                        "end_month": 4,
+                        "crop_type": "rice",
+                        "varieties": ["st25"],
+                        "salinity_risk": "low",
+                        "note": "Nước ngọt từ thượng nguồn"
+                    },
+                    {
+                        "id": "shrimp_brackish",
+                        "name": "Tôm nước lợ",
+                        "start_month": 5,
+                        "end_month": 11,
+                        "crop_type": "shrimp",
+                        "varieties": ["tom_su", "tom_cang_xanh"],
+                        "salinity_risk": "high",
+                        "note": "Triều cường, mặn cao"
+                    }
+                ]
+            }
+        }
+    }
+}
+
+# Hàm lấy mùa vụ hiện tại
+def get_current_season(station_id: str):
+    """Xác định mùa vụ hiện tại dựa trên tháng và vị trí"""
+    current_month = datetime.datetime.now().month
+    
+    # Map station to region
+    region_map = {
+        "ST-01": "soc_trang_bac_lieu",
+        "ST-02": "soc_trang_bac_lieu",
+        "ST-03": "ca_mau_kien_giang",
+        "ST-04": "ca_mau_kien_giang",
+        "ST-05": "soc_trang_bac_lieu",
+    }
+    
+    region_key = region_map.get(station_id, "soc_trang_bac_lieu")
+    region = CROP_ROTATION["dong_bang_song_cuu_long"]["regions"][region_key]
+    
+    # Tìm mùa vụ phù hợp
+    for cycle in region["cycles"]:
+        start, end = cycle["start_month"], cycle["end_month"]
+        
+        # Xử lý trường hợp qua năm (VD: 11->3)
+        if start > end:
+            if current_month >= start or current_month <= end:
+                return cycle
+        else:
+            if start <= current_month <= end:
+                return cycle
+    
+    # Mặc định trả về mùa đầu tiên
+    return region["cycles"][0]
+
+def get_next_season(station_id: str):
+    """Lấy thông tin mùa vụ tiếp theo"""
+    current_month = datetime.datetime.now().month
+    
+    region_map = {
+        "ST-01": "soc_trang_bac_lieu",
+        "ST-02": "soc_trang_bac_lieu",
+        "ST-03": "ca_mau_kien_giang",
+        "ST-04": "ca_mau_kien_giang",
+        "ST-05": "soc_trang_bac_lieu",
+    }
+    
+    region_key = region_map.get(station_id, "soc_trang_bac_lieu")
+    region = CROP_ROTATION["dong_bang_song_cuu_long"]["regions"][region_key]
+    cycles = region["cycles"]
+    
+    current_season = get_current_season(station_id)
+    current_idx = next((i for i, c in enumerate(cycles) if c["id"] == current_season["id"]), 0)
+    next_idx = (current_idx + 1) % len(cycles)
+    
+    next_season = cycles[next_idx]
+    
+    # Tính ngày còn lại đến mùa tiếp theo
+    next_month = next_season["start_month"]
+    if next_month < current_month:
+        next_month += 12
+    months_remaining = next_month - current_month
+    
+    return {
+        **next_season,
+        "months_remaining": months_remaining,
+        "days_remaining": months_remaining * 30  # Ước lượng
+    }
+
+
+@app.post("/api/switch-season")
+async def switch_season(request: Request):
+    """API cho phép người dùng thủ công chuyển mùa vụ"""
+    data = await request.json()
+    station_id = data.get("station_id", "ST-01")
+    new_crop = data.get("crop_type")
+    new_variety = data.get("variety")
+    
+    # Cập nhật cấu hình trạm
+    if station_id in STATION_CONFIG:
+        STATION_CONFIG[station_id]["crop"] = new_crop
+        STATION_CONFIG[station_id]["variety"] = new_variety
+        
+        # Ghi log
+        print(f"✅ Trạm {station_id} chuyển sang {new_crop} - {new_variety}")
+        
+        return {
+            "status": "ok",
+            "message": f"Đã chuyển sang mùa {new_crop}",
+            "new_config": STATION_CONFIG[station_id]
+        }
+    
+    return {"status": "error", "message": "Trạm không tồn tại"}
+
 # ===== HELPERS =====
 def create_station_template():
     return {
@@ -278,24 +440,14 @@ def _verify_password(plain: str, hashed: str) -> bool:
         return False
 
 def load_users():
-    default_users = [
-        {"username": "user1", "password": "123", "name": "Nông dân A (Sóc Trăng)", "role": "user", "station_id": "ST-01"},
-        {"username": "user2", "password": "123", "name": "Nông dân B (Bạc Liêu)", "role": "user", "station_id": "ST-02"},
-        {"username": "admin", "password": "123", "name": "Quản trị viên", "role": "admin", "station_id": "ST-01"},
-    ]
-    if os.path.exists(USER_DB_FILE):
-        try:
-            with open(USER_DB_FILE, "r", encoding="utf-8") as f:
-                content = f.read().strip()
-                if not content:
-                    return default_users
-                users = json.loads(content)
-                if isinstance(users, list) and users:
-                    return users
-                return default_users
-        except Exception:
-            return default_users
-    return default_users
+    if not os.path.exists(USER_DB_FILE):
+        return []
+    try:
+        with open(USER_DB_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"❌ Lỗi đọc users.json: {e}")
+        return []
 
 def save_users(users):
     try:
@@ -304,6 +456,143 @@ def save_users(users):
     except Exception as e:
         print(f"Error saving users: {e}")
 
+
+def get_user_crop_data(username: str):
+    """Lấy thông tin mùa vụ của user"""
+    users = load_users()
+    for user in users:
+        if user.get("username") == username:
+            return user.get("crop_data", None)
+    return None
+
+def update_user_crop_data(username: str, crop_data: dict):
+    """Cập nhật thông tin mùa vụ vào user profile"""
+    users = load_users()
+    updated = False
+    for user in users:
+        if user.get("username") == username:
+            user["crop_data"] = {
+                "crop_type": crop_data.get("crop_type"),
+                "variety": crop_data.get("variety"),
+                "planting_date": crop_data.get("planting_date"),
+                "last_updated": datetime.datetime.now().isoformat()
+            }
+            updated = True
+            break
+    
+    if updated:
+        save_users(users)
+        return True
+    return False
+
+def calculate_growth_stage(crop_type: str, variety: str, days: int) -> dict:
+    """Tính giai đoạn sinh trưởng tự động"""
+    stage_ranges = {
+        "rice": {
+            "st25": [
+                {"key": "seedling", "start": 1, "end": 20, "name": "Giai đoạn mạ"},
+                {"key": "tillering", "start": 21, "end": 45, "name": "Đẻ nhánh"},
+                {"key": "panicle", "start": 46, "end": 75, "name": "Làm đòng"},
+                {"key": "flowering", "start": 76, "end": 90, "name": "Ra hoa"},
+                {"key": "maturity", "start": 91, "end": 110, "name": "Chín"}
+            ],
+            "om5451": [
+                {"key": "seedling", "start": 1, "end": 20, "name": "Giai đoạn mạ"},
+                {"key": "tillering", "start": 21, "end": 40, "name": "Đẻ nhánh"},
+                {"key": "panicle", "start": 41, "end": 70, "name": "Làm đòng"},
+                {"key": "flowering", "start": 71, "end": 85, "name": "Ra hoa"},
+                {"key": "maturity", "start": 86, "end": 105, "name": "Chín"}
+            ],
+            "om6976": [
+                {"key": "seedling", "start": 1, "end": 20, "name": "Giai đoạn mạ"},
+                {"key": "tillering", "start": 21, "end": 45, "name": "Đẻ nhánh"},
+                {"key": "panicle", "start": 46, "end": 75, "name": "Làm đòng"},
+                {"key": "flowering", "start": 76, "end": 90, "name": "Ra hoa"},
+                {"key": "maturity", "start": 91, "end": 110, "name": "Chín"}
+            ]
+        },
+        "shrimp": {
+            "tom_su": [
+                {"key": "postlarval", "start": 1, "end": 30, "name": "Hậu ấu trùng"},
+                {"key": "juvenile", "start": 31, "end": 60, "name": "Tôm con"},
+                {"key": "adult", "start": 61, "end": 120, "name": "Tôm trưởng thành"}
+            ],
+            "tom_the": [
+                {"key": "postlarval", "start": 1, "end": 25, "name": "Hậu ấu trùng"},
+                {"key": "juvenile", "start": 26, "end": 50, "name": "Tôm con"},
+                {"key": "adult", "start": 51, "end": 100, "name": "Tôm trưởng thành"}
+            ],
+            "tom_cang_xanh": [
+                {"key": "juvenile", "start": 1, "end": 60, "name": "Tôm non"},
+                {"key": "adult", "start": 61, "end": 150, "name": "Tôm trưởng thành"}
+            ]
+        }
+    }
+    
+    ranges = stage_ranges.get(crop_type, {}).get(variety, [])
+    
+    for stage_range in ranges:
+        if stage_range["start"] <= days <= stage_range["end"]:
+            return {
+                "stage": stage_range["key"],
+                "name": stage_range["name"],
+                "days": days,
+                "start_day": stage_range["start"],
+                "end_day": stage_range["end"],
+                "progress": round((days - stage_range["start"]) / (stage_range["end"] - stage_range["start"]) * 100)
+            }
+    advice = ""
+
+
+    if ranges and days > ranges[-1]["end"]:
+        advice = ""
+    
+    if stage_range["key"] == "seedling":
+        advice = "⚠️ Giai đoạn mạ rất nhạy mặn. Không lấy nước khi mặn > 2‰"
+    elif stage_range["key"] == "tillering":
+        advice = "✅ Theo dõi đẻ nhành, bón phân đạm vừa phải"
+    
+    return {
+        "stage": "harvest",
+        "name": "Đã thu hoạch / Cần gieo mới",
+        "days": days,
+        "progress": 100,
+        "advice": advice
+    }
+
+    return {"stage": "unknown", "name": "Chưa xác định", "days": days, "progress": 0}
+
+def get_cycle_length(crop_type: str, variety: str) -> int:
+    """Lấy chu kỳ sinh trưởng của giống"""
+    cycles = {
+        "rice": {"st25": 110, "om5451": 105, "om6976": 110},
+        "shrimp": {"tom_su": 120, "tom_the": 100, "tom_cang_xanh": 150}
+    }
+    return cycles.get(crop_type, {}).get(variety, 110)
+
+def update_user_crop_info(username: str, crop_data: dict):
+    """Cập nhật thông tin mùa vụ vào user profile"""
+    users = load_users()
+    for user in users:
+        if user.get("username") == username:
+            user["crop_info"] = {
+                "crop_type": crop_data.get("crop_type"),
+                "variety": crop_data.get("variety"),
+                "planting_date": crop_data.get("planting_date"),
+                "growth_stage": crop_data.get("growth_stage"),
+                "last_updated": datetime.datetime.now().isoformat()
+            }
+            break
+    save_users(users)
+    return True
+
+def get_user_crop_info(username: str):
+    """Lấy thông tin mùa vụ từ user profile"""
+    users = load_users()
+    for user in users:
+        if user.get("username") == username:
+            return user.get("crop_info")
+    return None
 def _maybe_migrate_passwords(users: list) -> bool:
     changed = False
     for u in users:
@@ -314,6 +603,113 @@ def _maybe_migrate_passwords(users: list) -> bool:
     return changed
 
 db = load_data()
+
+
+class CropSeasonData(BaseModel):
+    username: str
+    crop_type: str
+    variety: str
+    planting_date: str
+    growth_stage: Optional[str] = None
+
+@app.post("/api/save-crop-season")
+async def save_crop_season(data: CropSeasonData):
+    """Lưu thông tin mùa vụ vào user profile"""
+    try:
+        users = load_users()
+        user_found = False
+        
+        for user in users:
+            if user.get("username") == data.username:
+                user_found = True
+                
+                # Tính toán giai đoạn tự động
+                planting_date = datetime.datetime.fromisoformat(data.planting_date)
+                days_since = (datetime.datetime.now() - planting_date).days
+                
+                auto_stage = calculate_growth_stage(
+                    data.crop_type,
+                    data.variety,
+                    days_since
+                )
+                
+                # Lưu thông tin đầy đủ
+                user["crop_data"] = {
+                    "crop_type": data.crop_type,
+                    "variety": data.variety,
+                    "planting_date": data.planting_date,
+                    "cycle_length": get_cycle_length(data.crop_type, data.variety),
+                    "current_stage": auto_stage.get("stage"),
+                    "days_since_planting": days_since,
+                    "last_updated": datetime.datetime.now().isoformat()
+                }
+                
+                # Cập nhật STATION_CONFIG
+                station_id = user.get("station_id", "ST-01")
+                if station_id in STATION_CONFIG:
+                    STATION_CONFIG[station_id]["crop"] = data.crop_type
+                    STATION_CONFIG[station_id]["variety"] = data.variety
+                
+                break
+        
+        if not user_found:
+            return {"status": "error", "message": "Không tìm thấy user"}
+        
+        save_users(users)
+        
+        return {
+            "status": "ok",
+            "message": "Đã lưu thông tin mùa vụ thành công",
+            "auto_stage": auto_stage
+        }
+        
+    except Exception as e:
+        print(f"❌ Error saving crop season: {e}")
+        return {"status": "error", "message": str(e)}
+
+class CropUpdateModel(BaseModel):
+    username: str
+    crop_type: str
+    variety: str
+    planting_date: str
+
+@app.get("/api/get-crop-season")
+async def get_crop_season(username: str):
+    """Lấy thông tin mùa vụ của user"""
+    try:
+        users = load_users()
+        for user in users:
+            if user.get("username") == username:
+                crop_data = user.get("crop_data", {})
+                
+                if crop_data and crop_data.get("planting_date"):
+                    # Tính số ngày đã trồng
+                    planting_date = datetime.datetime.fromisoformat(crop_data["planting_date"])
+                    days_since = (datetime.datetime.now() - planting_date).days
+                    
+                    # Tính giai đoạn hiện tại
+                    auto_stage = calculate_growth_stage(
+                        crop_data["crop_type"],
+                        crop_data["variety"],
+                        days_since
+                    )
+                    
+                    return {
+                        "status": "ok",
+                        "crop_data": crop_data,
+                        "days_since_planting": days_since,
+                        "auto_stage": auto_stage
+                    }
+                else:
+                    return {"status": "error", "message": "Chưa có dữ liệu mùa vụ"}
+        
+        return {"status": "error", "message": "Không tìm thấy user"}
+    
+    except Exception as e:
+        print(f"❌ Error getting crop season: {e}")
+        return {"status": "error", "message": str(e)}
+
+# API: Lưu thông tin mùa vụ
 
 # ===== SMART ANALYSIS =====
 def analyze_environment_smart(
@@ -394,6 +790,11 @@ async def register_page(request: Request):
     if register_file.exists():
         return templates.TemplateResponse("register.html", {"request": request})
     return RedirectResponse(url="/login?mode=register", status_code=302)
+# Thêm sau @app.get("/register")
+
+@app.get("/crop-management", response_class=HTMLResponse)
+async def crop_management_page(request: Request):
+    return templates.TemplateResponse("crop-management.html", {"request": request})
 
 @app.get("/admin")
 async def admin_page(request: Request):
@@ -589,8 +990,11 @@ async def get_weather_prediction(device_id: str = "ST-01"):
     if weather_data.get("status") != "ok":
         return {"prediction": "Không thể lấy dữ liệu thời tiết."}
 
+    # ✅ KIỂM TRA MODEL TRƯỚC KHI SỬ DỤNG
     if model is None:
-        return {"prediction": "AI chưa sẵn sàng (thiếu cấu hình API Key hoặc lỗi khởi tạo)."}
+        return {
+            "prediction": "⚠️ AI chưa sẵn sàng. Vui lòng kiểm tra API key trong file .env"
+        }
 
     try:
         station_info = STATION_CONFIG.get(device_id, {"crop": "rice"})
@@ -614,14 +1018,28 @@ Yêu cầu:
 """.strip()
 
         res = model.generate_content(prompt)
-        return {"prediction": (res.text or "").strip()}
+        
+        # ✅ KIỂM TRA KẾT QUẢ
+        if res and res.text:
+            prediction_text = res.text.strip()
+            print(f"✅ AI Prediction: {prediction_text}")
+            return {"prediction": prediction_text}
+        else:
+            return {"prediction": "⚠️ AI không trả về kết quả. Vui lòng thử lại sau."}
+            
     except Exception as e:
-        print(f"AI Error: {e}")
-        return {"prediction": "Hệ thống AI đang bận phân tích, vui lòng thử lại sau."}
-
-# =========================
-# ===== LOGIN API (bcrypt)
-# =========================
+        print(f"❌ Lỗi Gemini API: {e}")
+        error_msg = str(e)
+        
+        # ✅ XỬ LÝ CÁC LỖI PHỔ BIẾN
+        if "API_KEY_INVALID" in error_msg or "invalid api key" in error_msg.lower():
+            return {"prediction": "❌ API key không hợp lệ. Vui lòng kiểm tra lại trong file .env"}
+        elif "quota" in error_msg.lower():
+            return {"prediction": "⚠️ Đã hết quota API miễn phí. Vui lòng nâng cấp hoặc chờ reset."}
+        elif "RESOURCE_EXHAUSTED" in error_msg:
+            return {"prediction": "⚠️ Vượt quá giới hạn request. Vui lòng thử lại sau 1 phút."}
+        else:
+            return {"prediction": f"⚠️ Lỗi AI: {error_msg[:100]}"}
 
 class RegisterData(BaseModel):
     username: str  # phone number
@@ -673,20 +1091,31 @@ async def login(data: LoginData):
             return {"status": "error", "msg": "Sai mật khẩu"}
     return {"status": "error", "msg": "Số điện thoại không tồn tại"}
 
-# =========================
-# ===== AI IMAGE API ======
-# =========================
 
 @app.post("/api/analyze-image")
 async def analyze_image(file: UploadFile = File(...)):
+    # ✅ KIỂM TRA API KEY
     if not GOOGLE_API_KEY:
-        return {"status": "error", "msg": "Thiếu API Key", "solution": ""}
+        return {
+            "status": "error", 
+            "msg": "Thiếu API Key", 
+            "solution": "Vui lòng thêm GOOGLE_API_KEY vào file .env"
+        }
 
+    # ✅ KIỂM TRA MODEL
     if model is None:
-        return {"status": "unknown", "msg": "AI chưa sẵn sàng", "solution": "Kiểm tra cấu hình API Key."}
+        return {
+            "status": "error", 
+            "msg": "AI chưa sẵn sàng", 
+            "solution": "Kiểm tra API key trong file .env và khởi động lại server."
+        }
 
     try:
-        img = Image.open(io.BytesIO(await file.read()))
+        # Đọc ảnh
+        img_bytes = await file.read()
+        img = Image.open(io.BytesIO(img_bytes))
+        
+        print(f"📸 Đã nhận ảnh: {file.filename}, kích thước: {img.size}")
 
         prompt = """
 Vai trò: Bạn là Chuyên gia Bác sĩ Nông nghiệp (AI Plant Pathologist) với 20 năm kinh nghiệm về Lúa và Tôm tại Đồng Bằng Sông Cửu Long.
@@ -704,21 +1133,55 @@ Yêu cầu đầu ra: Chỉ trả về 1 chuỗi JSON duy nhất (không Markdow
 }
 """.strip()
 
+        # ✅ GỌI API VỚI XỬ LÝ LỖI
         res = model.generate_content([prompt, img])
-        text = (res.text or "").replace("```json", "").replace("```", "").strip()
-        return json.loads(text)
+        
+        if not res or not res.text:
+            return {
+                "status": "error",
+                "msg": "AI không trả về kết quả",
+                "solution": "Vui lòng thử lại hoặc đổi ảnh khác."
+            }
+        
+        text = res.text.replace("```json", "").replace("```", "").strip()
+        
+        print(f"🤖 AI Response: {text}")
+        
+        # ✅ PARSE JSON AN TOÀN
+        try:
+            result = json.loads(text)
+            return result
+        except json.JSONDecodeError:
+            # Nếu AI không trả về JSON đúng format
+            return {
+                "status": "unknown",
+                "msg": "Không thể phân tích ảnh này",
+                "solution": "AI trả về: " + text[:200]
+            }
 
     except Exception as e:
-        print(f"AI Image Error: {e}")
-        return {
-            "status": "unknown",
-            "msg": "Không thể phân tích ảnh này",
-            "solution": "Vui lòng chụp lại ảnh rõ nét hơn hoặc kiểm tra kết nối mạng.",
-        }
-
-# =========================
-# ===== ADMIN API ========
-# =========================
+        print(f"❌ AI Image Error: {e}")
+        error_msg = str(e)
+        
+        # ✅ XỬ LÝ CÁC LỖI CỤ THỂ
+        if "API_KEY_INVALID" in error_msg:
+            return {
+                "status": "error",
+                "msg": "API key không hợp lệ",
+                "solution": "Vui lòng kiểm tra GOOGLE_API_KEY trong file .env"
+            }
+        elif "quota" in error_msg.lower():
+            return {
+                "status": "error",
+                "msg": "Hết quota API",
+                "solution": "Vui lòng nâng cấp gói hoặc chờ reset hàng tháng."
+            }
+        else:
+            return {
+                "status": "error",
+                "msg": "Lỗi không xác định",
+                "solution": f"Chi tiết: {error_msg[:150]}"
+            }
 
 @app.get("/api/admin/users")
 async def get_users():
@@ -778,3 +1241,57 @@ async def add_station(data: dict):
         db["stations"][sid] = create_station_template()
         save_data(db)
     return {"status": "ok"}
+
+class SwitchSeasonRequest(BaseModel):
+    username: str
+    crop_type: str  # 'rice' hoặc 'shrimp'
+    variety: str    # 'st25', 'tom_su', ...
+    start_date: str # 'YYYY-MM-DD'
+
+@app.post("/api/switch-season")
+async def switch_season(req: SwitchSeasonRequest):
+    users = load_users() # Hàm load user từ file JSON của bạn
+    user_found = False
+
+    for user in users:
+        if user["username"] == req.username:
+            user_found = True
+            
+            # 1. (Tùy chọn) Lưu mùa vụ cũ vào lịch sử trước khi ghi đè
+            if "crop_history" not in user:
+                user["crop_history"] = []
+            
+            if "crop_data" in user:
+                # Đánh dấu ngày kết thúc cho vụ cũ là ngày hôm qua
+                old_season = user["crop_data"]
+                old_season["end_date"] = datetime.now().strftime("%Y-%m-%d")
+                user["crop_history"].append(old_season)
+
+            # 2. Cập nhật mùa vụ mới
+            user["crop_data"] = {
+                "crop_type": req.crop_type,
+                "variety": req.variety,
+                "planting_date": req.start_date,
+                "status": "active"
+            }
+            
+            # 3. Cập nhật cấu hình trạm (Station Config) để ngưỡng cảnh báo thay đổi theo
+            # Ví dụ: Nếu chuyển sang Tôm, ngưỡng mặn cho phép sẽ tăng lên
+            station_id = user.get("station_id", "ST-01")
+            update_station_config(station_id, req.crop_type, req.variety)
+            
+            break
+    
+    if not user_found:
+        return {"status": "error", "msg": "Không tìm thấy người dùng"}
+
+    save_users(users) # Hàm lưu lại file JSON
+    return {"status": "ok", "msg": f"Đã chuyển sang vụ {req.crop_type} thành công!"}
+
+def update_station_config(station_id, crop_type, variety):
+    # Logic cập nhật ngưỡng cảnh báo (Thresholds)
+    # Bạn có thể lưu cái này vào file config riêng hoặc biến toàn cục
+    global STATION_CONFIG
+    if station_id in STATION_CONFIG:
+        STATION_CONFIG[station_id]["crop"] = crop_type
+        STATION_CONFIG[station_id]["variety"] = variety

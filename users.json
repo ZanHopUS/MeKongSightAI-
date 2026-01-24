@@ -4,7 +4,16 @@
         "password": "$2b$12$zpLpzUwpwqrKjMdCkItYse3cw/YnKGrnK4yMOlCnonAEEowqDBWKi",
         "name": "Nông dân A (Sóc Trăng - Lúa)",
         "role": "user",
-        "station_id": "ST-01"
+        "station_id": "ST-01",
+        "crop_data": {
+            "crop_type": "rice",
+            "variety": "st25",
+            "planting_date": "2025-12-29",
+            "cycle_length": 110,
+            "current_stage": "tillering",
+            "days_since_planting": 27,
+            "last_updated": "2026-01-25T03:23:59.706767"
+        }
     },
     {
         "username": "user2",

@@ -2,13 +2,13 @@
     "stations": {
         "ST-01": {
             "current": {
-                "salinity": 6.9,
-                "temperature": 32.4,
-                "ph": 7.0,
-                "water_level": 100.0,
-                "is_danger": true,
-                "alert": "NGUY HIỂM",
-                "timestamp": "2026-01-21T15:10:54.314549"
+                "salinity": 0.8,
+                "temperature": 26.8,
+                "ph": 8.2,
+                "water_level": 101.0,
+                "is_danger": false,
+                "alert": "CẢNH BÁO",
+                "timestamp": "2026-01-24T21:18:37.418542"
             },
             "history": [
                 {
@@ -549,6 +549,1014 @@
                     "temperature": 32.4,
                     "ph": 7.0,
                     "water_level": 100.0
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.9,
+                    "temperature": 31.3,
+                    "ph": 7.0,
+                    "water_level": 90.0
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 6.0,
+                    "temperature": 31.2,
+                    "ph": 6.9,
+                    "water_level": 89.9
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.9,
+                    "temperature": 31.1,
+                    "ph": 7.0,
+                    "water_level": 89.9
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.8,
+                    "temperature": 31.2,
+                    "ph": 6.9,
+                    "water_level": 90.1
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.7,
+                    "temperature": 31.3,
+                    "ph": 6.8,
+                    "water_level": 89.9
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.7,
+                    "temperature": 31.4,
+                    "ph": 6.7,
+                    "water_level": 90.0
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.7,
+                    "temperature": 31.5,
+                    "ph": 6.6,
+                    "water_level": 90.1
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.8,
+                    "temperature": 31.5,
+                    "ph": 6.8,
+                    "water_level": 90.2
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.6,
+                    "temperature": 31.4,
+                    "ph": 6.7,
+                    "water_level": 90.2
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.7,
+                    "temperature": 31.4,
+                    "ph": 6.9,
+                    "water_level": 90.3
+                },
+                {
+                    "time": "2026-01-21 15:17",
+                    "salinity": 5.8,
+                    "temperature": 31.3,
+                    "ph": 6.9,
+                    "water_level": 90.2
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.0,
+                    "temperature": 31.4,
+                    "ph": 6.8,
+                    "water_level": 90.1
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.1,
+                    "temperature": 31.2,
+                    "ph": 6.9,
+                    "water_level": 89.9
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.1,
+                    "temperature": 31.0,
+                    "ph": 6.9,
+                    "water_level": 90.0
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.2,
+                    "temperature": 31.1,
+                    "ph": 6.9,
+                    "water_level": 90.0
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.4,
+                    "temperature": 31.1,
+                    "ph": 6.9,
+                    "water_level": 89.9
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.5,
+                    "temperature": 30.9,
+                    "ph": 6.9,
+                    "water_level": 89.8
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.5,
+                    "temperature": 31.0,
+                    "ph": 6.7,
+                    "water_level": 90.0
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.4,
+                    "temperature": 30.9,
+                    "ph": 6.8,
+                    "water_level": 90.1
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.4,
+                    "temperature": 31.0,
+                    "ph": 7.0,
+                    "water_level": 90.2
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.3,
+                    "temperature": 31.2,
+                    "ph": 6.9,
+                    "water_level": 90.2
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.3,
+                    "temperature": 31.0,
+                    "ph": 7.0,
+                    "water_level": 90.3
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.3,
+                    "temperature": 31.3,
+                    "ph": 6.8,
+                    "water_level": 90.4
+                },
+                {
+                    "time": "2026-01-21 15:18",
+                    "salinity": 6.2,
+                    "temperature": 31.2,
+                    "ph": 6.7,
+                    "water_level": 90.5
+                },
+                {
+                    "time": "2026-01-21 15:19",
+                    "salinity": 6.1,
+                    "temperature": 31.0,
+                    "ph": 6.5,
+                    "water_level": 90.6
+                },
+                {
+                    "time": "2026-01-21 15:19",
+                    "salinity": 6.0,
+                    "temperature": 30.8,
+                    "ph": 6.6,
+                    "water_level": 90.6
+                },
+                {
+                    "time": "2026-01-21 15:20",
+                    "salinity": 5.8,
+                    "temperature": 30.8,
+                    "ph": 6.6,
+                    "water_level": 90.6
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 5.7,
+                    "temperature": 30.8,
+                    "ph": 6.8,
+                    "water_level": 90.6
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 5.9,
+                    "temperature": 30.8,
+                    "ph": 6.6,
+                    "water_level": 90.5
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 5.8,
+                    "temperature": 30.8,
+                    "ph": 6.6,
+                    "water_level": 90.4
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 5.8,
+                    "temperature": 30.7,
+                    "ph": 6.6,
+                    "water_level": 90.5
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 5.8,
+                    "temperature": 30.6,
+                    "ph": 6.6,
+                    "water_level": 90.4
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 5.9,
+                    "temperature": 30.7,
+                    "ph": 6.6,
+                    "water_level": 90.3
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.0,
+                    "temperature": 30.5,
+                    "ph": 6.5,
+                    "water_level": 90.4
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.1,
+                    "temperature": 30.3,
+                    "ph": 6.6,
+                    "water_level": 90.5
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.0,
+                    "temperature": 30.4,
+                    "ph": 6.6,
+                    "water_level": 90.5
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.1,
+                    "temperature": 30.5,
+                    "ph": 6.8,
+                    "water_level": 90.5
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.1,
+                    "temperature": 30.5,
+                    "ph": 6.7,
+                    "water_level": 90.3
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.3,
+                    "temperature": 30.6,
+                    "ph": 6.8,
+                    "water_level": 90.2
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.2,
+                    "temperature": 30.8,
+                    "ph": 6.9,
+                    "water_level": 90.1
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.0,
+                    "temperature": 30.8,
+                    "ph": 7.1,
+                    "water_level": 90.1
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.1,
+                    "temperature": 30.7,
+                    "ph": 7.1,
+                    "water_level": 90.3
+                },
+                {
+                    "time": "2026-01-21 15:21",
+                    "salinity": 6.0,
+                    "temperature": 30.7,
+                    "ph": 7.2,
+                    "water_level": 90.2
+                },
+                {
+                    "time": "2026-01-24 13:41",
+                    "salinity": 3.2,
+                    "temperature": 32.4,
+                    "ph": 7.0,
+                    "water_level": 100.0
+                },
+                {
+                    "time": "2026-01-24 13:41",
+                    "salinity": 3.2,
+                    "temperature": 32.4,
+                    "ph": 7.0,
+                    "water_level": 100.0
+                },
+                {
+                    "time": "2026-01-24 20:54",
+                    "salinity": 2.4,
+                    "temperature": 28.2,
+                    "ph": 7.7,
+                    "water_level": 100.0
+                },
+                {
+                    "time": "2026-01-24 20:54",
+                    "salinity": 2.4,
+                    "temperature": 28.4,
+                    "ph": 7.6,
+                    "water_level": 100.1
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.5,
+                    "temperature": 28.6,
+                    "ph": 7.8,
+                    "water_level": 100.0
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.3,
+                    "temperature": 28.5,
+                    "ph": 7.8,
+                    "water_level": 100.1
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.2,
+                    "temperature": 28.3,
+                    "ph": 8.0,
+                    "water_level": 100.0
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.1,
+                    "temperature": 28.4,
+                    "ph": 8.2,
+                    "water_level": 100.1
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.3,
+                    "temperature": 28.3,
+                    "ph": 8.1,
+                    "water_level": 100.3
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.4,
+                    "temperature": 28.1,
+                    "ph": 8.0,
+                    "water_level": 100.4
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.5,
+                    "temperature": 28.1,
+                    "ph": 8.1,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.6,
+                    "temperature": 27.9,
+                    "ph": 8.3,
+                    "water_level": 100.5
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.7,
+                    "temperature": 28.1,
+                    "ph": 8.2,
+                    "water_level": 100.7
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.6,
+                    "temperature": 28.3,
+                    "ph": 8.2,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.6,
+                    "temperature": 28.2,
+                    "ph": 8.2,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.5,
+                    "temperature": 28.2,
+                    "ph": 8.3,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.3,
+                    "temperature": 28.3,
+                    "ph": 8.2,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.2,
+                    "temperature": 28.4,
+                    "ph": 8.3,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.2,
+                    "temperature": 28.2,
+                    "ph": 6.7,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.1,
+                    "temperature": 28.3,
+                    "ph": 6.6,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.1,
+                    "temperature": 28.1,
+                    "ph": 6.5,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.2,
+                    "temperature": 28.3,
+                    "ph": 6.5,
+                    "water_level": 101.2
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.4,
+                    "temperature": 28.1,
+                    "ph": 6.7,
+                    "water_level": 101.3
+                },
+                {
+                    "time": "2026-01-24 20:55",
+                    "salinity": 2.3,
+                    "temperature": 27.9,
+                    "ph": 6.9,
+                    "water_level": 101.2
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.4,
+                    "temperature": 28.0,
+                    "ph": 7.1,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.4,
+                    "temperature": 28.2,
+                    "ph": 6.9,
+                    "water_level": 100.8
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.4,
+                    "temperature": 28.3,
+                    "ph": 6.9,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.5,
+                    "temperature": 28.1,
+                    "ph": 6.9,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.6,
+                    "temperature": 28.1,
+                    "ph": 6.8,
+                    "water_level": 100.7
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.7,
+                    "temperature": 28.1,
+                    "ph": 6.8,
+                    "water_level": 100.5
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.9,
+                    "temperature": 28.2,
+                    "ph": 6.8,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.9,
+                    "temperature": 28.1,
+                    "ph": 6.9,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 3.0,
+                    "temperature": 27.9,
+                    "ph": 7.0,
+                    "water_level": 100.8
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 3.0,
+                    "temperature": 27.7,
+                    "ph": 6.9,
+                    "water_level": 100.8
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 3.1,
+                    "temperature": 27.6,
+                    "ph": 6.7,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 3.1,
+                    "temperature": 27.6,
+                    "ph": 6.8,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.9,
+                    "temperature": 27.8,
+                    "ph": 6.7,
+                    "water_level": 100.7
+                },
+                {
+                    "time": "2026-01-24 20:56",
+                    "salinity": 2.7,
+                    "temperature": 27.9,
+                    "ph": 6.8,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:57",
+                    "salinity": 2.8,
+                    "temperature": 27.9,
+                    "ph": 6.9,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:57",
+                    "salinity": 3.0,
+                    "temperature": 28.0,
+                    "ph": 7.1,
+                    "water_level": 100.8
+                },
+                {
+                    "time": "2026-01-24 20:57",
+                    "salinity": 2.9,
+                    "temperature": 28.0,
+                    "ph": 7.2,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:57",
+                    "salinity": 2.8,
+                    "temperature": 28.2,
+                    "ph": 7.1,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 20:57",
+                    "salinity": 2.6,
+                    "temperature": 28.3,
+                    "ph": 7.1,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 20:57",
+                    "salinity": 2.5,
+                    "temperature": 28.5,
+                    "ph": 7.1,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:57",
+                    "salinity": 2.4,
+                    "temperature": 28.4,
+                    "ph": 7.1,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 2.3,
+                    "temperature": 28.3,
+                    "ph": 7.0,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 2.1,
+                    "temperature": 28.2,
+                    "ph": 7.0,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 2.0,
+                    "temperature": 28.1,
+                    "ph": 7.0,
+                    "water_level": 101.2
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 2.2,
+                    "temperature": 27.9,
+                    "ph": 7.0,
+                    "water_level": 101.2
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 2.3,
+                    "temperature": 27.7,
+                    "ph": 7.0,
+                    "water_level": 101.2
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 2.2,
+                    "temperature": 27.9,
+                    "ph": 7.1,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 2.4,
+                    "temperature": 27.9,
+                    "ph": 7.2,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 2.3,
+                    "temperature": 27.7,
+                    "ph": 7.2,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 2.1,
+                    "temperature": 27.7,
+                    "ph": 7.3,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 1.9,
+                    "temperature": 27.6,
+                    "ph": 7.5,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 1.7,
+                    "temperature": 27.6,
+                    "ph": 7.7,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 1.5,
+                    "temperature": 27.5,
+                    "ph": 7.8,
+                    "water_level": 100.7
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 1.7,
+                    "temperature": 27.5,
+                    "ph": 7.7,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 1.4,
+                    "temperature": 27.6,
+                    "ph": 7.8,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 20:58",
+                    "salinity": 1.3,
+                    "temperature": 27.5,
+                    "ph": 7.8,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 20:59",
+                    "salinity": 1.4,
+                    "temperature": 27.3,
+                    "ph": 7.7,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 21:00",
+                    "salinity": 1.5,
+                    "temperature": 27.4,
+                    "ph": 7.6,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 21:01",
+                    "salinity": 1.3,
+                    "temperature": 27.3,
+                    "ph": 7.4,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:02",
+                    "salinity": 1.3,
+                    "temperature": 27.1,
+                    "ph": 7.4,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 21:03",
+                    "salinity": 1.3,
+                    "temperature": 27.0,
+                    "ph": 7.5,
+                    "water_level": 100.8
+                },
+                {
+                    "time": "2026-01-24 21:04",
+                    "salinity": 1.2,
+                    "temperature": 27.1,
+                    "ph": 7.3,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 21:05",
+                    "salinity": 1.2,
+                    "temperature": 27.0,
+                    "ph": 7.4,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.3,
+                    "temperature": 26.9,
+                    "ph": 7.4,
+                    "water_level": 100.7
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.2,
+                    "temperature": 27.1,
+                    "ph": 7.4,
+                    "water_level": 100.7
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.3,
+                    "temperature": 26.9,
+                    "ph": 7.6,
+                    "water_level": 100.5
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.4,
+                    "temperature": 26.8,
+                    "ph": 7.6,
+                    "water_level": 100.5
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.3,
+                    "temperature": 26.8,
+                    "ph": 7.7,
+                    "water_level": 100.5
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.3,
+                    "temperature": 26.8,
+                    "ph": 7.8,
+                    "water_level": 100.7
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.5,
+                    "temperature": 26.9,
+                    "ph": 8.0,
+                    "water_level": 100.7
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.6,
+                    "temperature": 26.8,
+                    "ph": 7.9,
+                    "water_level": 100.7
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.4,
+                    "temperature": 26.7,
+                    "ph": 8.0,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.2,
+                    "temperature": 26.8,
+                    "ph": 8.0,
+                    "water_level": 100.5
+                },
+                {
+                    "time": "2026-01-24 21:06",
+                    "salinity": 1.1,
+                    "temperature": 26.7,
+                    "ph": 7.9,
+                    "water_level": 100.6
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.2,
+                    "temperature": 26.5,
+                    "ph": 7.8,
+                    "water_level": 100.8
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.3,
+                    "temperature": 26.6,
+                    "ph": 8.0,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.3,
+                    "temperature": 26.7,
+                    "ph": 7.9,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.5,
+                    "temperature": 26.6,
+                    "ph": 8.0,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.4,
+                    "temperature": 26.4,
+                    "ph": 8.0,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.5,
+                    "temperature": 26.3,
+                    "ph": 7.9,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.5,
+                    "temperature": 26.1,
+                    "ph": 8.0,
+                    "water_level": 101.2
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.5,
+                    "temperature": 26.1,
+                    "ph": 7.9,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.4,
+                    "temperature": 26.3,
+                    "ph": 8.1,
+                    "water_level": 101.2
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.3,
+                    "temperature": 26.3,
+                    "ph": 8.0,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.2,
+                    "temperature": 26.4,
+                    "ph": 7.8,
+                    "water_level": 100.9
+                },
+                {
+                    "time": "2026-01-24 21:07",
+                    "salinity": 1.1,
+                    "temperature": 26.3,
+                    "ph": 7.8,
+                    "water_level": 100.8
+                },
+                {
+                    "time": "2026-01-24 21:08",
+                    "salinity": 1.2,
+                    "temperature": 26.4,
+                    "ph": 7.8,
+                    "water_level": 101.0
+                },
+                {
+                    "time": "2026-01-24 21:09",
+                    "salinity": 1.1,
+                    "temperature": 26.5,
+                    "ph": 7.9,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:10",
+                    "salinity": 1.0,
+                    "temperature": 26.3,
+                    "ph": 7.9,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:11",
+                    "salinity": 0.9,
+                    "temperature": 26.5,
+                    "ph": 7.9,
+                    "water_level": 101.2
+                },
+                {
+                    "time": "2026-01-24 21:12",
+                    "salinity": 0.8,
+                    "temperature": 26.4,
+                    "ph": 8.0,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:13",
+                    "salinity": 0.9,
+                    "temperature": 26.4,
+                    "ph": 8.0,
+                    "water_level": 101.1
+                },
+                {
+                    "time": "2026-01-24 21:14",
+                    "salinity": 0.9,
+                    "temperature": 26.6,
+                    "ph": 8.2,
+                    "water_level": 101.3
+                },
+                {
+                    "time": "2026-01-24 21:15",
+                    "salinity": 0.9,
+                    "temperature": 26.6,
+                    "ph": 8.1,
+                    "water_level": 101.5
+                },
+                {
+                    "time": "2026-01-24 21:16",
+                    "salinity": 1.0,
+                    "temperature": 26.4,
+                    "ph": 8.0,
+                    "water_level": 101.3
+                },
+                {
+                    "time": "2026-01-24 21:17",
+                    "salinity": 0.9,
+                    "temperature": 26.6,
+                    "ph": 8.0,
+                    "water_level": 101.3
+                },
+                {
+                    "time": "2026-01-24 21:18",
+                    "salinity": 0.8,
+                    "temperature": 26.8,
+                    "ph": 8.2,
+                    "water_level": 101.2
                 }
             ]
         },

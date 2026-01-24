@@ -12,55 +12,55 @@
 
 <body>
     <div id="login-container" class="login-wrapper">
-    <div class="login-box">
+        <div class="login-box">
 
-        <!-- CỘT GIỚI THIỆU -->
-        <div class="login-intro">
-            <i class="fas fa-seedling intro-icon"></i>
-            <h1>Mekong Sight AI</h1>
-            <p class="intro-desc">
-                Hệ thống giám sát thông minh hỗ trợ bà con canh tác
-                <strong>Lúa – Tôm</strong> thích ứng biến đổi khí hậu.
-            </p>
+            <!-- CỘT GIỚI THIỆU -->
+            <div class="login-intro">
+                <i class="fas fa-seedling intro-icon"></i>
+                <h1>Mekong Sight AI</h1>
+                <p class="intro-desc">
+                    Hệ thống giám sát thông minh hỗ trợ bà con canh tác
+                    <strong>Lúa – Tôm</strong> thích ứng biến đổi khí hậu.
+                </p>
 
-            <ul class="intro-features">
-                <li><i class="fas fa-check-circle"></i> Theo dõi độ mặn, mực nước, pH, nhiệt độ</li>
-                <li><i class="fas fa-bell"></i> Cảnh báo rủi ro môi trường sớm</li>
-                <li><i class="fas fa-robot"></i> AI tư vấn mùa vụ & chẩn đoán bệnh</li>
-            </ul>
-        </div>
-
-        <!-- CỘT ĐĂNG NHẬP -->
-        <div class="login-content">
-            <div class="brand-login">
-                <h2>Đăng nhập hệ thống</h2>
-                <p>Dành cho người dân và cán bộ quản lý</p>
+                <ul class="intro-features">
+                    <li><i class="fas fa-check-circle"></i> Theo dõi độ mặn, mực nước, pH, nhiệt độ</li>
+                    <li><i class="fas fa-bell"></i> Cảnh báo rủi ro môi trường sớm</li>
+                    <li><i class="fas fa-robot"></i> AI tư vấn mùa vụ & chẩn đoán bệnh</li>
+                </ul>
             </div>
 
-            <div id="login-error" class="login-error"></div>
-
-            <form onsubmit="handleLogin(event)">
-                <div class="input-group">
-                    <label>Tên đăng nhập</label>
-                    <input type="text" id="username" placeholder="Nhập tên đăng nhập">
+            <!-- CỘT ĐĂNG NHẬP -->
+            <div class="login-content">
+                <div class="brand-login">
+                    <h2>Đăng nhập hệ thống</h2>
+                    <p>Dành cho người dân và cán bộ quản lý</p>
                 </div>
 
-                <div class="input-group">
-                    <label>Mật khẩu</label>
-                    <input type="password" id="password" placeholder="Nhập mật khẩu">
+                <div id="login-error" class="login-error"></div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label>Tên đăng nhập</label>
+                        <input type="text" id="username" placeholder="Nhập tên đăng nhập">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" id="password" placeholder="Nhập mật khẩu">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Đăng nhập</button>
+                </form>
+
+                <div class="login-footer">
+                    <span>Chưa có tài khoản?</span>
+                    <a href="/register">Đăng ký ngay</a>
                 </div>
-
-                <button type="submit" class="btn-primary">Đăng nhập</button>
-            </form>
-
-            <div class="login-footer">
-                <span>Chưa có tài khoản?</span>
-                <a href="/register">Đăng ký ngay</a>
             </div>
-        </div>
 
+        </div>
     </div>
-</div>
     <div id="main-app" class="app-container" style="display: none;">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -137,23 +137,105 @@
                                     <option value="om5451">OM5451</option>
                                 </select>
                             </div>
-                            <div class="crop-selector-item">
-                                <label>Giai đoạn</label>
-                                <select id="growth-stage">
-                                    <option value="">-- Chọn giai đoạn --</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="page-content">
+
+                    <div class="card" id="season-info-panel"
+                        style="border-top: 4px solid #059669; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; background: white;">
+
+                        <div class="card-header"
+                            style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #eee;">
+                            <h3 class="card-title"
+                                style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #374151; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-seedling" style="color: #059669;"></i>
+                                Thông tin mùa vụ hiện tại
+                            </h3>
+
+                            <a href="/crop-management" class="btn-edit"
+                                style="background-color: #059669; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s;">
+                                <i class="fas fa-edit"></i> Chỉnh sửa
+                            </a>
+                        </div>
+
+                        <div class="card-content" style="padding: 20px;">
+                            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+
+                                <div style="flex: 1; min-width: 250px;">
+                                    <div
+                                        style="display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #f3f4f6; padding-bottom: 8px;">
+                                        <span style="color: #6b7280; font-size: 0.95rem;"><i
+                                                class="fas fa-calendar-check"
+                                                style="margin-right: 8px; width: 20px; text-align: center;"></i>Ngày
+                                            xuống giống:</span>
+                                        <strong id="ss-start-date" style="color: #111827;">--/--/----</strong>
+                                    </div>
+
+                                    <div
+                                        style="display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #f3f4f6; padding-bottom: 8px;">
+                                        <span style="color: #6b7280; font-size: 0.95rem;"><i class="fas fa-clock"
+                                                style="margin-right: 8px; width: 20px; text-align: center;"></i>Thời
+                                            gian nuôi:</span>
+                                        <strong id="ss-days-count" style="color: #059669; font-size: 1.1rem;">0
+                                            ngày</strong>
+                                    </div>
+
+                                    <div
+                                        style="display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #f3f4f6; padding-bottom: 8px;">
+                                        <span style="color: #6b7280; font-size: 0.95rem;"><i class="fas fa-chart-line"
+                                                style="margin-right: 8px; width: 20px; text-align: center;"></i>Giai
+                                            đoạn:</span>
+                                        <strong id="ss-stage-name" style="color: #d97706;">Đang cập nhật...</strong>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="color: #6b7280; font-size: 0.95rem;"><i
+                                                class="fas fa-flag-checkered"
+                                                style="margin-right: 8px; width: 20px; text-align: center;"></i>Dự kiến
+                                            thu
+                                            hoạch:</span>
+                                        <strong id="ss-harvest-date" style="color: #111827;">--/--/----</strong>
+                                    </div>
+                                </div>
+
+                                <div
+                                    style="width: 140px; display: flex; flex-direction: column; align-items: center; border-left: 1px solid #f3f4f6; padding-left: 20px;">
+                                    <div style="position: relative; width: 100px; height: 100px;">
+                                        <svg viewBox="0 0 36 36"
+                                            style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                                            <path
+                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                fill="none" stroke="#f3f4f6" stroke-width="3" />
+                                            <path id="progress-circle-path" stroke-dasharray="0, 100"
+                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round"
+                                                style="transition: stroke-dasharray 1s ease;" />
+                                        </svg>
+                                        <div
+                                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                            <span id="progress-text"
+                                                style="display: block; font-size: 0.9rem; font-weight: 800; color: #374151;">0%</span>
+                                        </div>
+                                    </div>
+                                    <span style="font-size: 0.8rem; color: #9ca3af; margin-top: 8px;">Tiến độ vụ
+                                        mùa</span>
+                                </div>
+                            </div>
+
+                            <div id="stage-advice"
+                                style="margin-top: 15px; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 10px 15px; color: #065f46; font-size: 0.9rem; display: flex; align-items: start; gap: 10px;">
+                                <i class="fas fa-info-circle" style="margin-top: 3px;"></i>
+                                <span>Đang tải dữ liệu mùa vụ...</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid-2">
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    <i class="fas fa-tint"></i>
-                                    Độ mặn nước
+                                    <i class="fas fa-tint"></i> Độ mặn nước
                                 </h3>
                             </div>
                             <div class="gauge-container">
@@ -170,8 +252,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    Trạng thái môi trường
+                                    <i class="fas fa-exclamation-triangle"></i> Trạng thái môi trường
                                 </h3>
                             </div>
                             <div class="status-section">
@@ -186,40 +267,33 @@
                             <ul id="advice-list" class="alert-list"></ul>
                         </div>
                     </div>
-
-                    <div class="grid-3">
-
-                        <div class="card metric-card">
-                            <div class="metric-icon blue">
-                                <i class="fas fa-thermometer-half"></i>
-                            </div>
-                            <div class="metric-info">
-                                <div class="metric-label">Nhiệt độ</div>
-                                <div class="metric-value" id="val-temp">30°C</div>
-                            </div>
+                </div>
+                <div class="grid-3">
+                    <div class="card metric-card">
+                        <div class="metric-icon blue"><i class="fas fa-thermometer-half"></i></div>
+                        <div class="metric-info">
+                            <div class="metric-label">Nhiệt độ</div>
+                            <div class="metric-value" id="val-temp">30°C</div>
                         </div>
+                    </div>
 
-                        <div class="card metric-card">
-                            <div class="metric-icon purple">
-                                <i class="fas fa-flask"></i>
-                            </div>
-                            <div class="metric-info">
-                                <div class="metric-label">Độ pH</div>
-                                <div class="metric-value" id="val-ph">7.0</div>
-                            </div>
+                    <div class="card metric-card">
+                        <div class="metric-icon purple"><i class="fas fa-flask"></i></div>
+                        <div class="metric-info">
+                            <div class="metric-label">Độ pH</div>
+                            <div class="metric-value" id="val-ph">7.0</div>
                         </div>
+                    </div>
 
-                        <div class="card metric-card">
-                            <div class="metric-icon yellow">
-                                <i class="fas fa-water"></i>
-                            </div>
-                            <div class="metric-info">
-                                <div class="metric-label">Mực nước</div>
-                                <div class="metric-value" id="val-water">100 cm</div>
-                            </div>
+                    <div class="card metric-card">
+                        <div class="metric-icon yellow"><i class="fas fa-water"></i></div>
+                        <div class="metric-info">
+                            <div class="metric-label">Mực nước</div>
+                            <div class="metric-value" id="val-water">100 cm</div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <div id="page-history" class="page-section">

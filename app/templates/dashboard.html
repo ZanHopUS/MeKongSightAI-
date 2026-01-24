@@ -12,55 +12,55 @@
 
 <body>
     <div id="login-container" class="login-wrapper">
-    <div class="login-box">
+        <div class="login-box">
 
-        <!-- CỘT GIỚI THIỆU -->
-        <div class="login-intro">
-            <i class="fas fa-seedling intro-icon"></i>
-            <h1>Mekong Sight AI</h1>
-            <p class="intro-desc">
-                Hệ thống giám sát thông minh hỗ trợ bà con canh tác
-                <strong>Lúa – Tôm</strong> thích ứng biến đổi khí hậu.
-            </p>
+            <!-- CỘT GIỚI THIỆU -->
+            <div class="login-intro">
+                <i class="fas fa-seedling intro-icon"></i>
+                <h1>Mekong Sight AI</h1>
+                <p class="intro-desc">
+                    Hệ thống giám sát thông minh hỗ trợ bà con canh tác
+                    <strong>Lúa – Tôm</strong> thích ứng biến đổi khí hậu.
+                </p>
 
-            <ul class="intro-features">
-                <li><i class="fas fa-check-circle"></i> Theo dõi độ mặn, mực nước, pH, nhiệt độ</li>
-                <li><i class="fas fa-bell"></i> Cảnh báo rủi ro môi trường sớm</li>
-                <li><i class="fas fa-robot"></i> AI tư vấn mùa vụ & chẩn đoán bệnh</li>
-            </ul>
-        </div>
-
-        <!-- CỘT ĐĂNG NHẬP -->
-        <div class="login-content">
-            <div class="brand-login">
-                <h2>Đăng nhập hệ thống</h2>
-                <p>Dành cho người dân và cán bộ quản lý</p>
+                <ul class="intro-features">
+                    <li><i class="fas fa-check-circle"></i> Theo dõi độ mặn, mực nước, pH, nhiệt độ</li>
+                    <li><i class="fas fa-bell"></i> Cảnh báo rủi ro môi trường sớm</li>
+                    <li><i class="fas fa-robot"></i> AI tư vấn mùa vụ & chẩn đoán bệnh</li>
+                </ul>
             </div>
 
-            <div id="login-error" class="login-error"></div>
-
-            <form onsubmit="handleLogin(event)">
-                <div class="input-group">
-                    <label>Tên đăng nhập</label>
-                    <input type="text" id="username" placeholder="Nhập tên đăng nhập">
+            <!-- CỘT ĐĂNG NHẬP -->
+            <div class="login-content">
+                <div class="brand-login">
+                    <h2>Đăng nhập hệ thống</h2>
+                    <p>Dành cho người dân và cán bộ quản lý</p>
                 </div>
 
-                <div class="input-group">
-                    <label>Mật khẩu</label>
-                    <input type="password" id="password" placeholder="Nhập mật khẩu">
+                <div id="login-error" class="login-error"></div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label>Tên đăng nhập</label>
+                        <input type="text" id="username" placeholder="Nhập tên đăng nhập">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" id="password" placeholder="Nhập mật khẩu">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Đăng nhập</button>
+                </form>
+
+                <div class="login-footer">
+                    <span>Chưa có tài khoản?</span>
+                    <a href="#" onclick="openRegister()">Đăng ký ngay</a>
                 </div>
-
-                <button type="submit" class="btn-primary">Đăng nhập</button>
-            </form>
-
-            <div class="login-footer">
-                <span>Chưa có tài khoản?</span>
-                <a href="#" onclick="openRegister()">Đăng ký ngay</a>
             </div>
-        </div>
 
+        </div>
     </div>
-</div>
     <div id="main-app" class="app-container" style="display: none;">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -114,35 +114,6 @@
                 <div class="page-header">
                     <div class="page-header-content">
                         <div class="page-title">
-                            <h1>Dashboard Giám Sát</h1>
-                            <div class="page-subtitle">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span id="current-date"></span>
-                                <i class="fas fa-clock"></i>
-                                <span id="current-time"></span>
-                            </div>
-                        </div>
-                        <div class="crop-selector">
-                            <div class="crop-selector-item">
-                                <label>Loại cây trồng</label>
-                                <select id="crop-type" onchange="updateVarieties()">
-                                    <option value="rice">Lúa</option>
-                                    <option value="shrimp">Tôm</option>
-                                </select>
-                            </div>
-                            <div class="crop-selector-item">
-                                <label>Giống</label>
-                                <select id="crop-variety" onchange="updateThresholds()">
-                                    <option value="st25">ST24/ST25</option>
-                                    <option value="om5451">OM5451</option>
-                                </select>
-                            </div>
-                            <div class="crop-selector-item">
-                                <label>Giai đoạn</label>
-                                <select id="growth-stage">
-                                    <option value="">-- Chọn giai đoạn --</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
                 </div>
