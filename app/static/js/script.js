@@ -80,14 +80,12 @@ const STAGE_ADVICE_MAP = {
     'panicle': "Bón đón đòng. Giữ mực nước ổn định, phòng bệnh đạo ôn.",
     'flowering': "Giữ nước đủ ẩm. Phòng ngừa lem lép hạt.",
     'maturity': "Rút nước cạn dần. Chuẩn bị thu hoạch.",
-    'post_larvae': "Kiểm tra pH/kiềm 2 lần/ngày. Gây màu nước.", // Cho Tôm
+    'post_larvae': "Kiểm tra pH/kiềm 2 lần/ngày. Gây màu nước.", 
     'grow_out': "Tăng cường quạt nước. Bổ sung khoáng, vitamin.",
     'harvest': "Xi phông đáy ao kỹ. Chuẩn bị lưới thu hoạch."
 };
 
-// --- Hàm tìm giai đoạn từ FARMING_DATA ---
 function getCurrentStageFromData(cropType, variety, daysOld) {
-    // 1. Lấy danh sách giai đoạn từ cấu hình có sẵn
     const cropConfig = FARMING_DATA[cropType];
     if (!cropConfig || !cropConfig.varieties[variety]) {
         return { name: "Chưa xác định", advice: "Vui lòng cập nhật giống cây trồng." };
@@ -95,32 +93,27 @@ function getCurrentStageFromData(cropType, variety, daysOld) {
 
     const stagesObj = cropConfig.varieties[variety].stages;
 
-    // 2. Duyệt qua từng giai đoạn để check ngày
     for (const [stageKey, stageNameStr] of Object.entries(stagesObj)) {
-        // stageNameStr ví dụ: "Giai đoạn mạ (1–20 ngày)"
-
-        // Dùng Regex để bắt khoảng ngày: 1 và 20
+      
         const match = stageNameStr.match(/(\d+)[-–](\d+)/);
 
         if (match) {
             const minDay = parseInt(match[1]);
             const maxDay = parseInt(match[2]);
 
-            // Nếu số ngày tuổi nằm trong khoảng này (hoặc trễ hơn chút xíu vẫn tính)
             if (daysOld >= minDay && daysOld <= maxDay) {
                 return {
-                    name: stageNameStr, // Lấy nguyên văn text của bạn
+                    name: stageNameStr, 
                     advice: STAGE_ADVICE_MAP[stageKey] || "Theo dõi các chỉ số môi trường thường xuyên."
                 };
             }
         }
     }
 
-    // 3. Nếu vượt quá số ngày của giai đoạn cuối cùng
     return { name: "Đã đến hạn thu hoạch", advice: "Kiểm tra độ chín và tiến hành thu hoạch." };
 }
 
-// === STATE MANAGEMENT ===
+
 let currentRules = null;
 let userStationId = "ST-01";
 let userName = "Người dùng";
@@ -139,11 +132,11 @@ let tideChartInstance = null;
 let currentRange = "24h";
 let currentParam = "all";
 
-// Update intervals
+
 let dataInterval = null;
 let timeInterval = null;
 
-// INITIALIZATION
+
 
 document.addEventListener("DOMContentLoaded", () => {
     initializeDatetime();
@@ -152,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     timeInterval = setInterval(updateDatetime, 1000);
 
-    // ✅ THÊM: Tự động kiểm tra đăng nhập khi tải trang
     checkAutoLogin();
 });
 
@@ -160,18 +152,13 @@ async function checkAutoLogin() {
     const savedUser = localStorage.getItem('mekong_username');
 
     if (savedUser) {
-        // Nếu tìm thấy username trong bộ nhớ trình duyệt, tự động vào Dashboard
         console.log('🔄 Đang khôi phục phiên đăng nhập cho:', savedUser);
 
-        // Ẩn màn hình đăng nhập, hiện Dashboard ngay lập tức
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
 
-        // Cập nhật tên hiển thị tạm thời
         document.getElementById('display-name').textContent = savedUser;
 
-        // Gọi API lấy lại thông tin user đầy đủ (Role, Station ID) nếu cần
-        // Hoặc khởi tạo hệ thống luôn
         userName = savedUser;
         initializeSystem(savedUser);
         await loadUserCropData(savedUser);
@@ -203,7 +190,6 @@ function updateDatetime() {
     if (timeElem) timeElem.textContent = timeStr;
 }
 
-// AUTHENTICATION
 
 async function handleLogin(event) {
     event.preventDefault();
@@ -232,18 +218,14 @@ async function handleLogin(event) {
             userStationId = data.station_id || 'ST-01';
             userRole = data.role || 'user';
 
-            // LƯU USERNAME VÀO LOCALSTORAGE
             localStorage.setItem('mekong_username', username);
 
-            // Hide login, show app
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('main-app').style.display = 'flex';
 
-            // Update user info
             document.getElementById('display-name').textContent = userName;
             document.getElementById('station-id').textContent = `Trạm: ${userStationId}`;
 
-            // Show admin link if admin
             if (userRole === 'admin') {
                 const adminLink = document.createElement('a');
                 adminLink.href = '/admin';
@@ -253,8 +235,7 @@ async function handleLogin(event) {
                 document.querySelector('nav').insertBefore(adminLink, document.querySelector('.logout'));
             }
 
-            // Initialize system VỚI AUTO-LOAD
-            initializeSystem(username); // THÊM THAM SỐ
+            initializeSystem(username); 
             await loadUserCropData(username);
         } else {
             errorElement.style.display = 'block';
@@ -330,20 +311,18 @@ async function handleRegistration(event) {
         if (successElement) successElement.style.display = 'none';
     }
 }
-// SYSTEM INITIALIZATION
-async function initializeSystem(username) {
-    console.log('🚀 Initializing system for:', username);
 
-    // ✅ Load crop data TRƯỚC
+async function initializeSystem(username) {
+    console.log(' Initializing system for:', username);
+
+    
     await loadUserCropData(username);
 
-    // Load các dữ liệu khác
     fetchSensorData();
     fetchWeatherData();
     fetchHistory(currentRange, currentParam);
     fetchWeatherAI();
 
-    // Polling
     dataInterval = setInterval(() => {
         fetchSensorData();
     }, 3000);
@@ -353,7 +332,6 @@ async function initializeSystem(username) {
     }, 600000);
 }
 
-// CROP SELECTION
 
 function updateVarieties() {
     const cropType = document.getElementById('crop-type').value;
@@ -408,7 +386,6 @@ function updateThresholds() {
     fetchSensorData();
 }
 
-// SENSOR DATA FETCHING
 
 async function fetchSensorData() {
     try {
@@ -418,7 +395,6 @@ async function fetchSensorData() {
         updateSensorDisplay(data);
         updateGauge(data.salinity);
 
-        // Get analysis from backend
         const cropType = document.getElementById('crop-type').value;
         const varietyKey = document.getElementById('crop-variety').value;
         const stageSelect = document.getElementById('growth-stage');
@@ -458,7 +434,6 @@ function updateGauge(salinity) {
     }
 }
 
-// ANALYSIS DISPLAY
 
 function updateAnalysisDisplay(analysis) {
     updateStatusBadge(analysis.level, analysis.status);
@@ -502,7 +477,6 @@ function updateAdviceList(advice, predictions) {
 
     let html = '';
 
-    // Add advice items
     advice.forEach(item => {
         let alertClass = 'alert-info';
         let icon = 'fa-info-circle';
@@ -529,7 +503,6 @@ function updateAdviceList(advice, predictions) {
         `;
     });
 
-    // Add predictions
     if (predictions && predictions.length > 0) {
         predictions.forEach(pred => {
             html += `
@@ -547,13 +520,11 @@ function updateAdviceList(advice, predictions) {
 function updateDetailedAnalysis(detailed) {
     if (!detailed) return;
 
-    // Update score if available
     if (detailed.overall_score !== undefined) {
         const scoreElem = document.getElementById('overall-score');
         if (scoreElem) {
             scoreElem.textContent = detailed.overall_score;
 
-            // Update color based on score
             const scoreContainer = scoreElem.parentElement;
             if (scoreContainer) {
                 scoreContainer.className = 'score-display';
@@ -569,7 +540,6 @@ function updateDetailedAnalysis(detailed) {
     }
 }
 
-// CHART RENDERING
 
 function changeRange(range) {
     currentRange = range;
@@ -598,11 +568,9 @@ async function fetchHistory(range, param) {
         const response = await fetch(`/api/sensor-history?device_id=${userStationId}&range=${range}`);
         const data = await response.json();
 
-        // Render các biểu đồ
         if (param === 'all' || param === 'salinity') renderChart('salinityChart', data, 'salinity', 'Độ mặn (‰)', '#16a34a');
         if (param === 'all' || param === 'water') renderChart('waterChart', data, 'water', 'Mực nước (cm)', '#3b82f6');
 
-        // === CẬP NHẬT THỐNG KÊ (FIX LỖI) ===
         if (data.stats) {
             updateStatBox('salinity', data.stats.salinity);
             updateStatBox('temperature', data.stats.temperature);
@@ -613,7 +581,6 @@ async function fetchHistory(range, param) {
     } catch (error) { console.error(error); }
 }
 
-// Hàm phụ trợ cập nhật số liệu
 function updateStatBox(type, stats) {
     if (!stats) return;
     const avgEl = document.getElementById(`${type}-avg`);
@@ -631,24 +598,20 @@ function renderChart(canvasId, data, dataKey, label, color) {
 
     const ctx = canvas.getContext('2d');
 
-    // Gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
     gradient.addColorStop(0, color + '33');
     gradient.addColorStop(1, color + '00');
 
-    // Get existing chart instance
     let chartInstance;
     if (canvasId === 'salinityChart') chartInstance = salinityChartInstance;
     else if (canvasId === 'tempChart') chartInstance = tempChartInstance;
     else if (canvasId === 'phChart') chartInstance = phChartInstance;
     else if (canvasId === 'waterChart') chartInstance = waterChartInstance;
 
-    // Destroy existing
     if (chartInstance) {
         chartInstance.destroy();
     }
 
-    // Create new chart
     const newChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -710,7 +673,6 @@ function renderChart(canvasId, data, dataKey, label, color) {
         }
     });
 
-    // Store instance
     if (canvasId === 'salinityChart') salinityChartInstance = newChart;
     else if (canvasId === 'tempChart') tempChartInstance = newChart;
     else if (canvasId === 'phChart') phChartInstance = newChart;
@@ -729,7 +691,6 @@ function updateStatistics(stats) {
     }
 }
 
-// WEATHER DATA
 
 async function fetchWeatherData() {
     try {
@@ -925,7 +886,6 @@ function renderTideChart(tide, dates) {
     });
 }
 
-// AI DIAGNOSIS
 
 async function uploadImage() {
     const fileInput = document.getElementById('camera-input');
@@ -953,16 +913,15 @@ async function uploadImage() {
 
         const result = await response.json();
 
-        console.log('🤖 AI Result:', result); // ✅ DEBUG
-
-        // ✅ XỬ LÝ CÁC TRƯỜNG HỢP
+        console.log(' AI Result:', result); 
+        
         if (result.status === 'error') {
             document.getElementById('ai-status').innerHTML = '❌ Lỗi: ' + result.msg;
             document.getElementById('ai-solution').textContent = result.solution || 'Vui lòng thử lại sau.';
             return;
         }
 
-        // Hiển thị kết quả
+        
         let statusHTML = result.msg || 'Đã hoàn tất phân tích';
         if (result.status === 'healthy') {
             statusHTML = '✅ ' + statusHTML;
@@ -982,7 +941,6 @@ async function uploadImage() {
     }
 }
 
-// NAVIGATION
 
 function switchPage(pageName) {
     document.querySelectorAll('.page-section').forEach(section => {
@@ -1012,20 +970,16 @@ function switchPage(pageName) {
         targetMob.classList.add('active');
     }
 
-    // Load data when switching to certain pages
     if (pageName === 'weather') {
         fetchWeatherData();
     }
 }
 
-// UTILITY FUNCTIONS
 
 function showNotification(message, type = 'info') {
     console.log(`[${type.toUpperCase()}] ${message}`);
-    // Can be enhanced with toast library
 }
 
-// MOBILE MENU TOGGLE (if needed)
 
 function toggleMobileMenu() {
     const sidebar = document.querySelector('.sidebar');
@@ -1040,7 +994,7 @@ async function fetchWeatherAI() {
 
         const aiBox = document.getElementById('ai-weather-prediction');
         if (aiBox) {
-            // Xóa icon quay tròn và hiện chữ
+           
             aiBox.innerHTML = `<i class="fas fa-magic" style="color:var(--info); margin-right:8px"></i> ${data.prediction}`;
         }
     } catch (error) {
@@ -1049,9 +1003,7 @@ async function fetchWeatherAI() {
 }
 
 
-// Thêm vào cuối file script.js
 
-// ===== SEASON MANAGEMENT =====
 let currentSeasonInfo = null;
 
 async function fetchSeasonInfo() {
@@ -1164,8 +1116,7 @@ function showSeasonSwitchModal() {
     let suggestedCrop = 'rice';
     let suggestionText = '';
 
-    // Logic miền Tây: Mùa mưa (Tháng 5-11) nuôi Tôm/Lúa, Mùa khô (Tháng 12-4) nuôi Tôm/Lúa tùy vùng
-    // Ví dụ đơn giản:
+
     if (currentMonth >= 5 && currentMonth <= 11) {
         suggestedCrop = 'rice';
         suggestionText = '🌧️ Hiện đang là mùa mưa, thích hợp để <strong>Rửa mặn - Trồng Lúa</strong>.';
@@ -1240,16 +1191,15 @@ async function confirmSeasonSwitch() {
     const cropType = document.getElementById('modal-crop-type').value;
     const variety = document.getElementById('modal-variety').value;
 
-    // Lấy ngày hiện tại làm ngày xuống giống mặc định cho vụ mới
     const today = new Date().toISOString().split('T')[0];
-    const username = localStorage.getItem('mekong_username'); // Lấy user từ localStorage
+    const username = localStorage.getItem('mekong_username'); 
 
     if (!username) {
         alert("Vui lòng đăng nhập lại!");
         return;
     }
 
-    const btn = event.target; // Nút xác nhận
+    const btn = event.target; 
     const originalText = btn.innerText;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
     btn.disabled = true;
@@ -1259,10 +1209,10 @@ async function confirmSeasonSwitch() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                username: username,      // Bổ sung username
+                username: username,      
                 crop_type: cropType,
                 variety: variety,
-                start_date: today        // Bổ sung ngày bắt đầu
+                start_date: today       
             })
         });
 
@@ -1271,20 +1221,18 @@ async function confirmSeasonSwitch() {
         if (result.status === 'ok') {
             alert('✅ ' + result.msg);
 
-            // Cập nhật giao diện ngay lập tức
             document.getElementById('crop-type').value = cropType;
-            updateVarieties(); // Hàm có sẵn trong script.js
-
+            updateVarieties(); 
             setTimeout(() => {
                 document.getElementById('crop-variety').value = variety;
-                updateThresholds(); // Cập nhật lại ngưỡng cảnh báo
+                updateThresholds(); 
             }, 100);
 
-            // Đóng modal
+       
             const modal = document.querySelector('.modal-overlay');
             if (modal) modal.remove();
 
-            // Tải lại dữ liệu mùa vụ mới để hiển thị vòng tròn tiến độ
+         
             loadUserCropData(username);
         } else {
             alert('❌ Lỗi: ' + result.msg);
@@ -1300,13 +1248,13 @@ async function confirmSeasonSwitch() {
     }
 }
 
-// Thêm vào hàm initializeSystem
+
 function initializeSystem() {
     fetchSensorData();
     fetchWeatherData();
     fetchHistory(currentRange, currentParam);
     fetchWeatherAI();
-    fetchSeasonInfo(); // ← THÊM DÒNG NÀY
+    fetchSeasonInfo(); 
 
     dataInterval = setInterval(() => {
         fetchSensorData();
@@ -1314,12 +1262,11 @@ function initializeSystem() {
 
     setInterval(() => {
         fetchWeatherData();
-        fetchSeasonInfo(); // ← THÊM DÒNG NÀY
+        fetchSeasonInfo(); 
     }, 600000);
 }
 
 function getStageInfo(cropType, variety, days) {
-    // Bản đồ lời khuyên (Có thể tùy chỉnh thêm)
     const adviceMap = {
         'seedling': "Giữ mực nước 1-3cm, phòng ốc bươu vàng.",
         'tillering': "Bón phân đợt 1, giữ nước nông.",
@@ -1329,12 +1276,10 @@ function getStageInfo(cropType, variety, days) {
         'harvest': "Đã đến lúc thu hoạch."
     };
 
-    // Lấy dữ liệu từ biến FARMING_DATA (đã có trong file của bạn)
     if (FARMING_DATA[cropType] && FARMING_DATA[cropType].varieties[variety]) {
         const stages = FARMING_DATA[cropType].varieties[variety].stages;
 
         for (const [key, label] of Object.entries(stages)) {
-            // Tách số ngày từ chuỗi text (ví dụ: "1–20 ngày")
             const match = label.match(/(\d+)[-–](\d+)/);
             if (match) {
                 const min = parseInt(match[1]);
@@ -1348,7 +1293,6 @@ function getStageInfo(cropType, variety, days) {
     return { name: "Đã thu hoạch / Chờ vụ mới", advice: "Cải tạo đất/nước cho vụ sau." };
 }
 
-// 2. Hàm tải dữ liệu và hiển thị lên Dashboard (Thay thế hàm cũ)
 async function loadUserCropData(username) {
     try {
         console.log('🔄 Loading crop data for:', username);
@@ -1363,17 +1307,14 @@ async function loadUserCropData(username) {
             const autoStage = result.auto_stage;
             const daysSince = result.days_since_planting;
 
-            // Format ngày
             const plantingDate = new Date(data.planting_date);
             const displayDate = plantingDate.toLocaleDateString('vi-VN');
 
-            // Tính ngày thu hoạch
             const cycleLength = data.cycle_length || 105;
             const harvestDate = new Date(plantingDate);
             harvestDate.setDate(harvestDate.getDate() + cycleLength);
             const displayHarvest = harvestDate.toLocaleDateString('vi-VN');
 
-            // Cập nhật UI
             if (document.getElementById('ss-start-date'))
                 document.getElementById('ss-start-date').textContent = displayDate;
 
@@ -1392,7 +1333,6 @@ async function loadUserCropData(username) {
                     `<i class="fas fa-lightbulb"></i> <b>Khuyến nghị:</b> ${adviceText}`;
             }
 
-            // Vẽ vòng tròn tiến độ
             const percent = autoStage.progress || 0;
             if (document.getElementById('progress-text'))
                 document.getElementById('progress-text').textContent = `${percent}%`;
@@ -1400,7 +1340,6 @@ async function loadUserCropData(username) {
             const circle = document.getElementById('progress-circle-path');
             if (circle) circle.setAttribute('stroke-dasharray', `${percent}, 100`);
 
-            // Đồng bộ dropdown
             const typeSelect = document.getElementById('crop-type');
             const varietySelect = document.getElementById('crop-variety');
 
@@ -1443,7 +1382,6 @@ function displayAutoStageInfo(autoStage, daysSince, plantingDate) {
         year: 'numeric'
     });
 
-    // ✅ Tính ngày dự kiến thu hoạch
     const cropType = document.getElementById('crop-type').value;
     const variety = document.getElementById('crop-variety').value;
     const cycleLength = FARMING_DATA[cropType].varieties[variety].cycle || 110;
@@ -1455,7 +1393,6 @@ function displayAutoStageInfo(autoStage, daysSince, plantingDate) {
         year: 'numeric'
     });
 
-    // ✅ Màu sắc theo giai đoạn
     let stageColor = '#10b981';
     let stageIcon = 'fa-seedling';
 
@@ -1537,7 +1474,6 @@ function lockCropSelectors() {
     document.getElementById('crop-type').disabled = true;
     document.getElementById('crop-variety').disabled = true;
 
-    // ✅ Thêm nút chỉnh sửa mùa vụ (chỉ hiện 1 lần)
     const cropSelector = document.querySelector('.crop-selector');
     if (cropSelector && !document.getElementById('btn-change-season')) {
         const changeBtn = document.createElement('a');
@@ -1635,7 +1571,6 @@ function calculateCurrentStageInModal() {
 
     if (!plantingDate || !cropType || !variety) return;
 
-    // ✅ FIX: Parse đúng định dạng
     const planted = new Date(plantingDate + 'T00:00:00');
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1734,13 +1669,13 @@ async function handleSaveCropSeasonInDashboard(event) {
     const plantingDate = document.getElementById('planting-date-modal').value;
 
     if (!cropType || !variety || !plantingDate) {
-        alert('⚠️ Vui lòng điền đầy đủ thông tin!');
+        alert(' Vui lòng điền đầy đủ thông tin!');
         return;
     }
 
     const username = localStorage.getItem('mekong_username');
     if (!username) {
-        alert('❌ Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+        alert(' Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
         window.location.href = '/login';
         return;
     }
@@ -1785,12 +1720,12 @@ async function handleSaveCropSeasonInDashboard(event) {
             }, 3000);
 
         } else {
-            alert('❌ Lỗi: ' + (result.message || 'Không thể lưu dữ liệu'));
+            alert(' Lỗi: ' + (result.message || 'Không thể lưu dữ liệu'));
         }
 
     } catch (error) {
-        console.error('❌ Save error:', error);
-        alert('❌ Lỗi kết nối. Vui lòng thử lại.');
+        console.error(' Save error:', error);
+        alert(' Lỗi kết nối. Vui lòng thử lại.');
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
@@ -1807,7 +1742,7 @@ async function loadUserCropDataInCropPage(username) {
             displayNoCropSeasonInfo();
         }
     } catch (error) {
-        console.error('❌ Load crop data error:', error);
+        console.error(' Load crop data error:', error);
         displayNoCropSeasonInfo();
     }
 }
