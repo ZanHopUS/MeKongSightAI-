@@ -1274,70 +1274,90 @@ function getStageInfo(cropType, variety, days) {
 
 async function loadUserCropData(username) {
     try {
-        console.log('🔄 Loading crop data for:', username);
-
-        const response = await fetch(`/api/get-crop-season?username=${encodeURIComponent(username)}`);
+        const response = await fetch(`/api/get-crop-season?username=${username}`);
         const result = await response.json();
 
-        console.log('📦 API Response:', result);
-
-        if (result.status === 'ok' && result.crop_data && result.crop_data.planting_date) {
+        if (result.status === 'ok' && result.crop_data) {
             const data = result.crop_data;
-            const autoStage = result.auto_stage;
-            const daysSince = result.days_since_planting;
 
-            const plantingDate = new Date(data.planting_date);
-            const displayDate = plantingDate.toLocaleDateString('vi-VN');
+            const plantingDateStr = data.planting_date;
+            if (!plantingDateStr) return;
 
-            const cycleLength = data.cycle_length || 105;
-            const harvestDate = new Date(plantingDate);
+            const start = new Date(plantingDateStr);
+            const now = new Date();
+            const days = Math.ceil((now - start) / (1000 * 60 * 60 * 24));
+
+            const pParts = plantingDateStr.split('-');
+            const displayDate = `${pParts[2]}/${pParts[1]}/${pParts[0]}`;
+
+            let cycleLength = 110;
+            if (FARMING_DATA[data.crop_type] &&
+                FARMING_DATA[data.crop_type].varieties[data.variety]) {
+                const varietyData = FARMING_DATA[data.crop_type].varieties[data.variety];
+                if (data.crop_type === 'rice') cycleLength = 110;
+                if (data.crop_type === 'shrimp') cycleLength = 100;
+            }
+
+            const harvestDate = new Date(start);
             harvestDate.setDate(harvestDate.getDate() + cycleLength);
-            const displayHarvest = harvestDate.toLocaleDateString('vi-VN');
+            const hDateStr = harvestDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            let stageName = "Đang phát triển";
+            let advice = "Theo dõi các chỉ số môi trường thường xuyên.";
+
+            if (typeof getStageInfo === "function") {
+                const stageInfo = getStageInfo(data.crop_type, data.variety, days);
+                stageName = stageInfo.name;
+                advice = stageInfo.advice;
+            }
 
             if (document.getElementById('ss-start-date'))
                 document.getElementById('ss-start-date').textContent = displayDate;
 
-            if (document.getElementById('ss-days-count'))
-                document.getElementById('ss-days-count').textContent = `${daysSince} ngày`;
-
-            if (document.getElementById('ss-harvest-date'))
-                document.getElementById('ss-harvest-date').textContent = displayHarvest;
-
-            if (document.getElementById('ss-stage-name'))
-                document.getElementById('ss-stage-name').textContent = autoStage.name;
-
-            if (document.getElementById('stage-advice')) {
-                const adviceText = STAGE_ADVICE_MAP[autoStage.stage] || "Theo dõi thường xuyên.";
-                document.getElementById('stage-advice').innerHTML =
-                    `<i class="fas fa-lightbulb"></i> <b>Khuyến nghị:</b> ${adviceText}`;
+            if (document.getElementById('ss-days-count')) {
+                const displayDays = days >= 0 ? days : 0;
+                document.getElementById('ss-days-count').textContent = `${displayDays} ngày`;
             }
 
-            const percent = autoStage.progress || 0;
+            if (document.getElementById('ss-harvest-date'))
+                document.getElementById('ss-harvest-date').textContent = hDateStr;
+
+            if (document.getElementById('ss-stage-name'))
+                document.getElementById('ss-stage-name').textContent = stageName;
+
+            if (document.getElementById('stage-advice'))
+                document.getElementById('stage-advice').innerHTML = `<i class="fas fa-leaf"></i> <b>Khuyến nghị:</b> ${advice}`;
+
+            let percent = Math.round((days / cycleLength) * 100);
+
+            percent = Math.max(0, Math.min(100, percent));
+
             if (document.getElementById('progress-text'))
                 document.getElementById('progress-text').textContent = `${percent}%`;
 
             const circle = document.getElementById('progress-circle-path');
-            if (circle) circle.setAttribute('stroke-dasharray', `${percent}, 100`);
+            if (circle) {
+                circle.setAttribute('stroke-dasharray', `${percent}, 100`);
+            }
 
             const typeSelect = document.getElementById('crop-type');
-            const varietySelect = document.getElementById('crop-variety');
-
-            if (typeSelect) typeSelect.value = data.crop_type;
-            updateVarieties();
-
-            setTimeout(() => {
-                if (varietySelect) varietySelect.value = data.variety;
-                updateThresholds();
-            }, 100);
-
-            console.log('✅ Crop data loaded successfully');
+            if (typeSelect && !typeSelect.disabled) {
+                typeSelect.value = data.crop_type;
+                updateVarieties();
+                setTimeout(() => {
+                    const varSelect = document.getElementById('crop-variety');
+                    if (varSelect) varSelect.value = data.variety;
+                }, 100);
+            }
 
         } else {
-            console.warn('⚠️ No crop data found');
-            showCropSetupPrompt();
+            if (document.getElementById('stage-advice'))
+                document.getElementById('stage-advice').innerHTML = `<i class="fas fa-exclamation-circle"></i> Chưa có dữ liệu mùa vụ.`;
+            if (document.getElementById('ss-days-count'))
+                document.getElementById('ss-days-count').textContent = "0 ngày";
         }
     } catch (error) {
-        console.error('❌ Error loading crop data:', error);
+        console.error("Lỗi khi tải dữ liệu mùa vụ:", error);
     }
 }
 
