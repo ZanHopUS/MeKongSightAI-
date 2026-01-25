@@ -6,13 +6,13 @@
         "role": "user",
         "station_id": "ST-01",
         "crop_data": {
-            "crop_type": "rice",
-            "variety": "st25",
+            "crop_type": "shrimp",
+            "variety": "tom_the",
             "planting_date": "2025-12-28",
-            "cycle_length": 110,
-            "current_stage": "tillering",
+            "cycle_length": 100,
+            "current_stage": "juvenile",
             "days_since_planting": 28,
-            "last_updated": "2026-01-25T07:01:45.173151"
+            "last_updated": "2026-01-25T10:05:56.270987"
         }
     },
     {
@@ -44,9 +44,9 @@
         "station_id": "ST-01"
     },
     {
-        "username": "01234567",
-        "password": "$2b$12$Lv.aTHhY08DVwDKtFIKKIOU9rUVDpPNJlAmgZEu67FigImzWNDNdy",
-        "name": "hoàng (hà tĩnh)",
+        "username": "0987654321",
+        "password": "$2b$12$NIjnFmc26w/Iq9XeBacW0.4aRidjoAPZtzQPAkmD99D4Y7eGi5haC",
+        "name": "Viethoang (Sóc Trăng)",
         "role": "user",
         "station_id": "ST-01"
     }

@@ -2,7 +2,7 @@
 MEKONGSIGHT AI - HỆ THỐNG GIÁM SÁT MÔI TRƯỜNG ĐA PHƯƠNG THỨC (IoT + AI)
 Hệ thống hỗ trợ ra quyết định thông minh cho mô hình Luân canh Tôm – Lúa thích ứng Biến đổi Khí hậu tại ĐBSCL
 
-#. 1 Vấn đề cần giải quyết (The Problem – Impact lớn)
+##  Problem statement (Vấn đề cần giải thuyết)
 
 - Đồng bằng sông Cửu Long (ĐBSCL) đang là khu vực chịu tổn thương nặng nề nhất bởi biến đổi khí hậu tại Việt Nam, với các hiện tượng ngày càng cực đoan và khó dự đoán như:
 + Xâm nhập mặn đến sớm hoặc kéo dài bất thường
@@ -17,7 +17,7 @@ Hệ thống hỗ trợ ra quyết định thông minh cho mô hình Luân canh 
 * Vấn đề cốt lõi:
 Nông dân đang phải ra quyết định sống còn trong điều kiện thiếu dữ liệu, thiếu cảnh báo sớm và thiếu công cụ hỗ trợ thông minh, trong khi biến đổi khí hậu ngày càng khó lường.
 
-#. 2 Tổng quan giải pháp (Solution Overview)
+##  Solution Overview (Tổng quan giải pháp)
 
 Mekong Sight AI là hệ thống hỗ trợ ra quyết định dựa trên dữ liệu dành cho mô hình Luân canh Tôm – Lúa, giúp nông dân chuyển từ “làm theo kinh nghiệm” sang “làm nông dựa trên dữ liệu số”.
 
@@ -39,7 +39,7 @@ Cách tiếp cận của Mekong Sight AI:
 Triết lý giải pháp:
 Không chỉ “đo cho biết”, mà đo để cảnh báo – phân tích – và hỗ trợ quyết định đúng thời điểm.
 
-#. 3️ Các tính năng chính (Key Features)
+##  Key Features (Các tính năng chính)
 
 🔹 1. Giám sát môi trường & Cảnh báo thông minh
 
@@ -82,7 +82,31 @@ Phân tích tổng hợp dữ liệu môi trường
 - Thích ứng theo điều kiện thực tế
 - Giảm rủi ro do biến đổi khí hậu
 
-#. CẤU TRÚC DỰ ÁN (MVC LITE)
+##  Setup & Installation
+
+# Prerequisites
+- Python >= 3.9
+- pip
+
+# Installation
+git clone https://github.com/ZanHopUS/MeKongSightAI-
+cd MeKongSightAI
+pip install -r requirements.txt
+
+##  Run instructions
+
+>>> BƯỚC 1: KHỞI ĐỘNG SERVER
+Mở Terminal, chạy lệnh sau:
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+>>> BƯỚC 2: TẠO ĐƯỜNG DẪN ONLINE (Để truy cập bằng điện thoại)
+Mở một Terminal khác, chạy lệnh:
+   python get_link.py
+
+>>> BƯỚC 3: TRUY CẬP HỆ THỐNG
+Lấy link trong terminal sau khi chạy 
+
+##  Project structure (Cấu trúc dự án)
 
 MekongSightAI/
  ├── app/                   # Mã nguồn chính (Backend & Frontend)
@@ -94,26 +118,62 @@ MekongSightAI/
  ├── sensor_data.json       # Cơ sở dữ liệu mini (Tự động tạo)
  ├── cloudflared.exe        # Công cụ đưa Web lên Internet
  ├── requirements.txt       # Danh sách thư viện cần cài đặt
- └── README.txt             # Hướng dẫn sử dụng
+ └── README.md              # Hướng dẫn sử dụng
 
-3. CÀI ĐẶT MÔI TRƯỜNG
+##  Tech Stack
 
-Yêu cầu: Đã cài đặt Python 3.9 trở lên.
+- Backend: Python 3.9+, FastAPI
+- Frontend: HTML, CSS, JavaScript (Vanilla)
+- AI/Logic: Rule-based + AI API (Gemini/OpenAI – optional)
+- Data: JSON-based lightweight storage
+- Deployment: Localhost / Cloudflare Tunnel
 
-Bước 1: Mở Terminal (CMD/PowerShell) tại thư mục dự án.
-Bước 2: Cài đặt các thư viện phụ thuộc bằng lệnh:
-   pip install -r requirements.txt
+##  System Architecture
 
-4. HƯỚNG DẪN CHẠY DEMO
+Hệ thống được thiết kế theo mô hình client–server đơn giản:
 
->>> BƯỚC 1: KHỞI ĐỘNG SERVER
-Mở Terminal, chạy lệnh sau:
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+- Người dùng truy cập giao diện Web (HTML/CSS/JS)
+- Frontend gọi API từ FastAPI backend
+- Backend xử lý:
+  - Dữ liệu môi trường
+  - Logic ngưỡng sinh thái
+  - (Tùy chọn) gọi AI để phân tích & khuyến nghị
+- Dữ liệu lưu trữ dạng JSON (phù hợp demo & triển khai nhẹ)
 
->>> BƯỚC 2: TẠO ĐƯỜNG DẪN ONLINE (Để truy cập bằng điện thoại)
-Mở một Terminal khác, chạy lệnh:
-   python get_link.py
+Thiết kế hướng đến:
+- Dễ triển khai
+- Không phụ thuộc hạ tầng phức tạp
+- Phù hợp điều kiện nông thôn
 
+##  User Guide
 
->>> BƯỚC 3: TRUY CẬP HỆ THỐNG
-Lấy link trong terminal sau khi chạy 
+1. Truy cập Dashboard
+2. Theo dõi các chỉ số môi trường (độ mặn, nhiệt độ, pH, mực nước)
+3. Chọn:
+   - Loại cây trồng / vật nuôi
+   - Giống
+   - Giai đoạn sinh trưởng
+4. Hệ thống hiển thị:
+   - Trạng thái an toàn / cảnh báo / nguy hiểm
+   - Khuyến nghị hành động cụ thể
+
+##  Reproducibility
+
+- Toàn bộ hệ thống có thể chạy lại chỉ với:
+  - Python
+  - requirements.txt
+- AI là tùy chọn, hệ thống vẫn hoạt động ở chế độ Demo nếu không có API key.
+
+## Attribution & Licensing
+
+Dự án sử dụng các tài nguyên mã nguồn mở
+FastAPI, Uvicorn, Requests: MIT/Apache 2.0 License.
+Chart.js, FontAwesome: MIT/Free License.
+Open-Meteo API: Creative Commons Attribution 4.0 (CC BY 4.0).
+
+## AI Declaration (Khai báo sử dụng AI)
+
+Tuân thủ quy định cuộc thi, chúng tôi khai báo:
+Core Logic: Google Gemini API được dùng làm nòng cốt cho tính năng phân tích và chẩn đoán.
+Coding Assistant: Sử dụng AI (ChatGPT/Copilot) để hỗ trợ tạo khung code giao diện và tối ưu hóa logic xử lý dữ liệu.
+Cam kết: Toàn bộ logic nghiệp vụ nông nghiệp (FARMING_RULES) và kiến trúc hệ thống do nhóm tự xây dựng.

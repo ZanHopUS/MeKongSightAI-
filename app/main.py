@@ -49,7 +49,7 @@ class NoCacheHTMLMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(NoCacheHTMLMiddleware)
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyCAMVygdt-FXdudpQZDjm0XrZWemPJlp1M")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY","AIzaSyAY-wxnIA12jfocl3eP1XCTUgBM-rMQidE")
 model = None
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
